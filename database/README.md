@@ -10,6 +10,7 @@ Berikut adalah spesifikasi teknis database yang diimplementasikan:
 - **Relasi**: Relasi fisik untuk jaringan transportasi dan relasi spasial dinamis untuk akses wisata.
 
 ## 📌 Entity Relationship Diagram (ERD)
+<img width="1188" height="441" alt="ERD-sigma" src="https://github.com/user-attachments/assets/65cff852-3ece-4bdd-b17c-08b162ba91eb" />
 
 
 ## 📕 Skema Database
