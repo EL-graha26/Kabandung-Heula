@@ -1,41 +1,89 @@
+import { useState } from "react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+} from "lucide-react";
+
 export default function FloatingMenu() {
 
+  const [open, setOpen] = useState(true);
+
   const routes = [
-    {
-      name: "Trans Metro Bandung",
-      color: "blue",
-    },
-    {
-      name: "Angkot",
-      color: "green",
-    },
-    {
-      name: "DAMRI",
-      color: "orange",
-    },
+    "DAMRI",
+    "BANDROS",
+    "TRANS METRO BANDUNG",
   ];
 
   return (
-    <div className="floating-menu">
+    <>
 
-      <h2 className="menu-title">
-        Rute Transportasi
-      </h2>
+      {/* OPEN BUTTON */}
 
-      <div className="route-list">
+      {!open && (
+        <button
+          className="open-menu-btn"
+          onClick={() => setOpen(true)}
+        >
+          <Menu size={30} />
+        </button>
+      )}
 
-        {routes.map((route, index) => (
-          <div className="route-item" key={index}>
+      {/* PANEL */}
 
-            <div className={`route-dot ${route.color}`}></div>
+      <div className={`transport-sidebar ${open ? "show" : ""}`}>
 
-            <p>{route.name}</p>
+        {/* CLOSE BUTTON */}
+
+        <button
+          className="close-btn"
+          onClick={() => setOpen(false)}
+        >
+          <X size={28} />
+        </button>
+
+        {/* HEADER */}
+
+        <div className="sidebar-header">
+          <h2>Pilih Rute</h2>
+        </div>
+
+        {/* HALTE */}
+
+        <div className="halte-card">
+
+          <div className="halte-top">
+
+            <div className="toggle-switch"></div>
+
+            <p>Tampilkan Halte Bus</p>
 
           </div>
-        ))}
+
+          <span>
+            Klik halte untuk melihat rute
+          </span>
+
+        </div>
+
+        {/* ROUTES */}
+
+        <div className="sidebar-routes">
+
+          {routes.map((route, index) => (
+            <div className="sidebar-route-card" key={index}>
+
+              <p>{route}</p>
+
+              <ChevronDown size={26} />
+
+            </div>
+          ))}
+
+        </div>
 
       </div>
 
-    </div>
+    </>
   );
 }
