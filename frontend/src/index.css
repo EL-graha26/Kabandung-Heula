@@ -1,69 +1,53 @@
+@import "leaflet/dist/leaflet.css";
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:sans-serif;
+  font-family:Arial, Helvetica, sans-serif;
 }
 
-body{
-  background:#00a651;
+html,
+body,
+#root{
+  width:100%;
+  height:100%;
 }
 
-/* NAVBAR */
+/* =========================
+   HOME PAGE
+========================= */
+
+.home-container{
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+}
 
 .navbar{
-  position:absolute;
-
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-
-  width:95%;
+  width:100%;
   height:90px;
-
-  z-index:9999;
+  background:white;
 
   display:flex;
   justify-content:space-between;
   align-items:center;
 
-  padding:0 40px;
+  padding:0 70px;
 
-  border-radius:25px;
+  position:fixed;
+  top:0;
+  left:0;
 
-  background:rgba(255,255,255,0.85);
+  z-index:1000;
 
-  backdrop-filter:blur(20px);
-
-  box-shadow:0 8px 30px rgba(0,0,0,0.15);
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap:15px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
 .logo h2{
-  color:#222;
-}
-
-.logo-circle{
-  width:50px;
-  height:50px;
-
-  border-radius:50%;
-
-  background:#00a651;
-
-  color:white;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:28px;
-  font-weight:bold;
+  color:#00aa4f;
+  font-size:32px;
+  font-weight:700;
 }
 
 .nav-links{
@@ -74,139 +58,158 @@ body{
 
 .nav-links a{
   text-decoration:none;
-  color:#222;
+  color:#111;
+
   font-size:20px;
   font-weight:600;
+
+  transition:0.3s;
 }
 
-/* MAP SECTION */
+.nav-links a:hover{
+  color:#00aa4f;
+}
 
-.map-section{
+.map-button{
+  border:none;
+  outline:none;
+
+  background:#00aa4f;
+  color:white;
+
+  padding:16px 34px;
+
+  border-radius:50px;
+
+  font-size:18px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:0.3s;
+
+  box-shadow:0 6px 14px rgba(0,0,0,0.15);
+}
+
+.map-button:hover{
+  transform:translateY(-2px);
+}
+
+.hero{
   width:100%;
+  height:100vh;
+
+  background-image:url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957");
+  background-size:cover;
+  background-position:center;
+
+  position:relative;
 
   display:flex;
   justify-content:center;
-
-  margin-top:130px;
-}
-
-.map-container{
-  position:relative;
-
-  width:92%;
-  height:78vh;
-
-  border-radius:30px;
-
-  overflow:hidden;
-
-  box-shadow:0 10px 40px rgba(0,0,0,0.2);
-}
-
-.map{
-  width:100%;
-  height:100%;
-}
-
-/* FLOAT BUTTON */
-
-.floating-btn{
-  position:absolute;
-
-  top:25px;
-  right:25px;
-
-  z-index:9999;
-
-  width:60px;
-  height:60px;
-
-  border:none;
-
-  border-radius:18px;
-
-  background:#00a651;
-
-  color:white;
-
-  font-size:30px;
-
-  cursor:pointer;
-
-  box-shadow:0 8px 20px rgba(0,0,0,0.2);
-}
-
-/* FLOATING PANEL */
-
-.floating-panel{
-  position:absolute;
-
-  top:100px;
-  right:25px;
-
-  width:400px;
-  max-height:600px;
-
-  overflow-y:auto;
-
-  z-index:9999;
-
-  border-radius:25px;
-
-  padding:25px;
-
-  background:rgba(255,255,255,0.92);
-
-  backdrop-filter:blur(20px);
-
-  box-shadow:0 8px 30px rgba(0,0,0,0.2);
-}
-
-.panel-header{
-  display:flex;
-  justify-content:space-between;
   align-items:center;
-
-  margin-bottom:20px;
 }
 
-.panel-header h3{
-  font-size:28px;
+.overlay{
+  position:absolute;
+  inset:0;
+
+  background:rgba(0,70,35,0.72);
 }
 
-.panel-header button{
-  border:none;
+.hero-content{
+  position:relative;
+  z-index:2;
 
-  width:45px;
-  height:45px;
-
-  border-radius:12px;
-
-  background:#ff5a5a;
-
+  text-align:center;
   color:white;
 
-  font-size:22px;
+  width:75%;
+}
 
-  cursor:pointer;
+.hero-content h1{
+  font-size:64px;
+  line-height:1.4;
+  font-weight:700;
+}
+
+.hero-content p{
+  margin-top:24px;
+
+  font-size:24px;
+  font-weight:400;
+}
+
+/* =========================
+   MAP PAGE
+========================= */
+
+.leaflet-container{
+  width:100%;
+  height:100vh;
+  z-index:1;
+}
+
+/* Floating Menu */
+
+.floating-menu{
+  position:fixed;
+
+  top:50%;
+  left:30px;
+
+  transform:translateY(-50%);
+
+  z-index:1000;
+
+  background:rgba(255,255,255,0.15);
+
+  backdrop-filter:blur(12px);
+
+  border:1px solid rgba(255,255,255,0.2);
+
+  border-radius:24px;
+
+  padding:18px;
+
+  width:260px;
+
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+.menu-title{
+  font-size:22px;
+  font-weight:700;
+
+  margin-bottom:18px;
+
+  color:#111;
 }
 
 .route-list{
   display:flex;
   flex-direction:column;
-  gap:15px;
+  gap:14px;
 }
 
 .route-item{
-  display:flex;
-  align-items:center;
-  gap:15px;
-
-  padding:20px;
+  background:white;
 
   border-radius:18px;
 
-  background:#f2f2f2;
+  padding:14px;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  cursor:pointer;
+
+  transition:0.3s;
+}
+
+.route-item:hover{
+  transform:translateX(4px);
 }
 
 .route-dot{
@@ -217,12 +220,121 @@ body{
 }
 
 .route-item p{
-  font-size:20px;
+  font-size:18px;
   font-weight:600;
 }
 
-/* LEAFLET */
+/* Route Colors */
 
-.leaflet-container{
-  background:#dfe6e9;
+.blue{
+  background:#2563eb;
+}
+
+.red{
+  background:#dc2626;
+}
+
+.green{
+  background:#16a34a;
+}
+
+.orange{
+  background:#ea580c;
+}
+
+/* Popup */
+
+.leaflet-popup-content-wrapper{
+  border-radius:18px;
+}
+
+.leaflet-popup-content{
+  font-size:15px;
+  line-height:1.5;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#00aa4f;
+  border-radius:20px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:992px){
+
+  .navbar{
+    padding:0 30px;
+  }
+
+  .nav-links{
+    gap:20px;
+  }
+
+  .nav-links a{
+    font-size:16px;
+  }
+
+  .map-button{
+    padding:12px 24px;
+    font-size:16px;
+  }
+
+  .hero-content{
+    width:90%;
+  }
+
+  .hero-content h1{
+    font-size:42px;
+  }
+
+  .hero-content p{
+    font-size:20px;
+  }
+
+  .floating-menu{
+    width:220px;
+  }
+}
+
+@media(max-width:768px){
+
+  .navbar{
+    height:auto;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    padding:20px;
+  }
+
+  .nav-links{
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  .hero-content h1{
+    font-size:32px;
+  }
+
+  .hero-content p{
+    font-size:18px;
+  }
+
+  .floating-menu{
+    left:10px;
+    width:200px;
+  }
+
+  .route-item p{
+    font-size:15px;
+  }
 }

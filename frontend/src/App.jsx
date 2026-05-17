@@ -1,13 +1,15 @@
-import Navbar from "./components/Navbar";
-import MapView from "./components/MapView";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import MapPage from "./pages/MapPage";
 
 function App() {
   return (
-    <div className="app">
-      <Navbar />
-
-      <MapView />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/map" element={<MapPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
