@@ -19,5 +19,3 @@ Database terdiri dari 4 tabel utama:
 2.  **`rute`**: Menyimpan jalur fisik perjalanan (LineString).
 3.  **`objek_wisata`**: Menyimpan area wilayah wisata (Polygon).
 4.  **`rute_halte`**: Tabel penghubung untuk urutan halte pada rute.
-
-## 📑 SQL Scripts

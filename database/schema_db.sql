@@ -1,20 +1,27 @@
---Mengaktifkan Ekstensi PostGIS
+-- =========================================================================
+-- AKTIVASI EKSTENSI & PEMBERSIHAN SKEMA (Idempotent)
+-- =========================================================================
 CREATE EXTENSION IF NOT EXISTS postgis;
+
+DROP TABLE IF EXISTS rute_halte CASCADE;
+DROP TABLE IF EXISTS objek_wisata CASCADE;
+DROP TABLE IF EXISTS rute CASCADE;
+DROP TABLE IF EXISTS halte CASCADE;
 
 DROP TYPE IF EXISTS jenis_halte;
 DROP TYPE IF EXISTS jenis_rute;
 
-DROP TABLE IF EXISTS halte;
-DROP TABLE IF EXISTS rute;
-DROP TABLE IF EXISTS objek_wisata;
-DROP TABLE IF EXISTS rute_halte;
-
---Membuat Tipe ENUM untuk Jenis Moda
+-- =========================================================================
+-- PEMBUATAN TIPE DATA ENUM (Moda Transportasi)
+-- =========================================================================
 CREATE TYPE jenis_halte AS ENUM ('Bus Trans', 'Angkot', 'Bandros');
 CREATE TYPE jenis_rute AS ENUM ('Bus Trans', 'Angkot');
 
+-- =========================================================================
+-- PEMBUATAN TABEL UTAMA & STRUKTUR GEOMETRI (DDL)
+-- =========================================================================
 
---Tabel Halte (Entitas Point)
+-- Tabel Halte (Entitas Point)
 CREATE TABLE halte (
     id_halte SERIAL PRIMARY KEY,
     nama VARCHAR(100) NOT NULL,
@@ -28,8 +35,7 @@ CREATE TABLE halte (
     geom GEOMETRY(Point, 4326)
 );
 
-
---Tabel Rute (Entitas LineString)
+-- Tabel Rute (Entitas LineString)
 CREATE TABLE rute (
     id_rute SERIAL PRIMARY KEY,
     nama_rute VARCHAR(100) NOT NULL,
@@ -44,8 +50,7 @@ CREATE TABLE rute (
     geom GEOMETRY(LineString, 4326)
 );
 
-
---Tabel Objek Wisata (Entitas Polygon)
+-- Tabel Objek Wisata (Entitas Polygon)
 CREATE TABLE objek_wisata (
     id_wisata SERIAL PRIMARY KEY,
     nama_wisata VARCHAR(100) NOT NULL,
@@ -55,8 +60,7 @@ CREATE TABLE objek_wisata (
     geom GEOMETRY(Polygon, 4326)
 );
 
-
---Tabel Relasi Rute_Halte (Pivot Table)
+-- Tabel Relasi Rute_Halte (Pivot Table Many-to-Many)
 CREATE TABLE rute_halte (
     id_rute INT REFERENCES rute(id_rute) ON DELETE CASCADE,
     id_halte INT REFERENCES halte(id_halte) ON DELETE CASCADE,
@@ -64,12 +68,16 @@ CREATE TABLE rute_halte (
     PRIMARY KEY (id_rute, id_halte, urutan)
 );
 
-
---Spatial Index untuk Optimasi Performa SIG
+-- =========================================================================
+-- SPATIAL INDEXING (Optimasi Performa Query SIG)
+-- =========================================================================
 CREATE INDEX idx_halte_geom ON halte USING GIST (geom);
 CREATE INDEX idx_rute_geom ON rute USING GIST (geom);
 CREATE INDEX idx_wisata_geom ON objek_wisata USING GIST (geom);
 
+-- =========================================================================
+-- ATA MANIPULATION LANGUAGE (DML) - SAMPLE RECORDS
+-- =========================================================================
 
 -- Sample Data untuk Tabel Halte. Atribut lainnya seperti fasilitas, jam_operasi, dan tarif blm ad datany.
 INSERT INTO halte (nama, kode, jenis, alamat, geom)
@@ -189,17 +197,36 @@ VALUES
     ('Panghega Waterboom', 'WST-019', 'Panghegar Waterboom merupakan salah satu destinasi wisata permainan air (waterpark) keluarga yang sangat populer di Bandung bagian selatan. Terletak di kawasan Bandung Kidul (dekat dengan area Moh. Toha), tempat rekreasi ini menjadi pilihan favorit warga Bandung dan sekitarnya untuk menghabiskan waktu liburan bersama anak-anak tanpa harus menempuh perjalanan jauh ke area Lembang atau Ciwidey.', ST_GeomFromText('POLYGON((107.6226299478369 -6.9612193701662335, 107.6221326137092 -6.961222741360462, 107.62211795321993 -6.961448863496029, 107.6225993259344 -6.96151469119759, 107.6226299478369 -6.9612193701662335))', 4326)),
     ('Margacinta Park', 'WST-020', 'Margacinta Park merupakan salah satu destinasi wisata rekreasi keluarga terpadu yang sangat populer di kawasan Bandung Timur. Terletak di Jalan Margacinta, Buahbatu, tempat ini menjadi pilihan favorit bagi warga lokal karena menggabungkan fasilitas taman bermain air modern (waterpark) dan area bermain anak dalam ruangan (indoor playground) di satu lokasi yang strategis dan mudah dijangkau.', ST_GeomFromText('POLYGON((107.64784404358267 -6.953917574938506, 107.64836956574335 -6.954047429289094, 107.64822747176862 -6.954900437138818, 107.64765684040992 -6.95477729961845, 107.64784404358267 -6.953917574938506))', 4326));
 
+-- Update Otomatis Atribut Luas Menggunakan Fungsi Spasial PostGIS (Satuan: KM persegi)
+UPDATE objek_wisata SET luas_km2 = ROUND((ST_Area(geom::geography) / 1000000)::numeric, 2);
 
+-- Update Otomatis Atribut Panjang Jalur Menggunakan Fungsi Spasial PostGIS (Satuan: KM)
+UPDATE rute SET panjang_km = ROUND((ST_Length(geom::geography) / 1000)::numeric, 2);
 
+-- =========================================================================
+-- QUERY ANALISIS SPASIAL UTAMA (Core GIS Logic)
+-- =========================================================================
 
-
-
-
-
-
-
-
-
-
-
-
+--- QUERY: MENCARI OBJEK WISATA TERDEKAT DARI HALTE YANG DIKLIK (RADIUS 5 KM)
+--- Menggunakan logi fallback: Jika radius 5 KM kosong, otomatis beri 1 rekomendasi terdekat absolut mutlak.
+WITH halte_terpilih AS (
+    SELECT geom FROM halte WHERE id_halte = 59 -- Simulasi "Halte Bandros Alun-alun" diklik di frontend
+),
+wisata_dalam_radius AS (
+    SELECT 
+        w.id_wisata, w.nama_wisata,
+        ROUND(ST_Distance(w.geom::geography, h.geom::geography)::numeric) AS jarak_meter
+    FROM objek_wisata w, halte_terpilih h
+    WHERE ST_DWithin(w.geom::geography, h.geom::geography, 5000) -- Radius batasan 5 Kilometer
+),
+wisata_terdekat_absolut AS (
+    SELECT 
+        w.id_wisata, w.nama_wisata,
+        ROUND(ST_Distance(w.geom::geography, h.geom::geography)::numeric) AS jarak_meter
+    FROM objek_wisata w, halte_terpilih h
+    ORDER BY jarak_meter ASC LIMIT 1
+)
+SELECT * FROM wisata_dalam_radius
+UNION
+SELECT * FROM wisata_terdekat_absolut WHERE NOT EXISTS (SELECT 1 FROM wisata_dalam_radius)
+ORDER BY jarak_meter ASC;
