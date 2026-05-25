@@ -78,21 +78,23 @@ async def get_wisata_geojson():
     pool = await get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch("""
-            SELECT id_wisata, nama_wisata, kode_wisata, deskripsi, luas_km2, ST_AsGeoJSON(geom) AS geom 
+            SELECT id_wisata, nama_wisata, kode_wisata, deskripsi, luas_km2, 
+                   ST_AsGeoJSON(geom) AS geom_json 
             FROM objek_wisata
+            WHERE geom IS NOT NULL  -- Pengaman agar tidak ada data null yang lolos ke frontend
         """)
         
         features = []
         for row in rows:
             feature = {
                 "type": "Feature",
-                "geometry": json.loads(row["geom"]) if row["geom"] else None,
+                "geometry": json.loads(row["geom_json"]) if row["geom_json"] else None,
                 "properties": {
                     "id_wisata": row["id_wisata"],
                     "nama_wisata": row["nama_wisata"],
                     "kode_wisata": row["kode_wisata"],
                     "deskripsi": row["deskripsi"],
-                    "luas_km2": float(row["luas_km2"]) if row["luas_km2"] else None
+                    "luas_km2": float(row["luas_km2"]) if row["luas_km2"] else 0.0
                 }
             }
             features.append(feature)

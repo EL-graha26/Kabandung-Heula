@@ -20,4 +20,5 @@ Database terdiri dari 4 tabel utama:
 3.  **`objek_wisata`**: Menyimpan area wilayah wisata (Polygon).
 4.  **`rute_halte`**: Tabel penghubung untuk urutan halte pada rute.
 
-## 📑 SQL Scripts
+## 🗺️ Hasil Tampilan QGIS
+<img width="2260" height="1239" alt="ss-qgis-sig_tubes" src="https://github.com/user-attachments/assets/6d016464-a1b4-40d1-94e5-b0fa1550e2ab" />
