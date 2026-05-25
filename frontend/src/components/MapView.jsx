@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { Link } from "react-router-dom";
 import L from "leaflet";
 import api from "../api";
 
@@ -116,6 +117,12 @@ function MapView() {
   return (
     <div className="map-section">
       <div className="map-container">
+
+        {/* TOMBOL KEMBALI KE HOME (KIRI ATAS) */}
+        <Link to="/" className="back-btn">
+          ⬅ Kembali
+        </Link>
+
         <MapContainer
           center={[-6.914744, 107.60981]} 
           zoom={12}
@@ -149,7 +156,7 @@ function MapView() {
         {/* FLOATING CONTROL UI */}
         <button className="floating-btn" onClick={() => setOpenMenu(!openMenu)}>☰</button>
         {openMenu && routeGeoJson?.features && (
-          <div className="floating-panel">
+          <div className="floating-panel right-side">
             <div className="panel-header">
               <h3>Daftar Trayek</h3>
               <button onClick={() => setOpenMenu(false)}>✕</button>
