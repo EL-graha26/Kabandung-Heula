@@ -79,9 +79,18 @@ async def get_halte_by_id(id: int):
 async def get_halte_geojson():
     pool = await get_pool()
     async with pool.acquire() as conn:
+        # Mengambil halte beserta daftar rute (nama rute) yang melewatinya
         rows = await conn.fetch("""
-            SELECT id_halte, nama, kode, jenis, alamat, fasilitas, aktif, ST_AsGeoJSON(geom) AS geom 
-            FROM halte
+            SELECT h.id_halte, h.nama, h.kode, h.jenis, h.alamat, h.fasilitas, h.aktif, 
+                   ST_AsGeoJSON(h.geom) AS geom,
+                   COALESCE(
+                       (SELECT array_agg(r.nama_rute) 
+                        FROM rute_halte rh 
+                        JOIN rute r ON rh.id_rute = r.id_rute 
+                        WHERE rh.id_halte = h.id_halte), 
+                       '{}'::character varying[]
+                   ) as rute_terkait
+            FROM halte h
         """)
         
         features = []
@@ -96,7 +105,8 @@ async def get_halte_geojson():
                     "jenis": row["jenis"],
                     "alamat": row["alamat"],
                     "fasilitas": row["fasilitas"],
-                    "aktif": row["aktif"]
+                    "aktif": row["aktif"],
+                    "rute_terkait": row["rute_terkait"]
                 }
             }
             features.append(feature)
