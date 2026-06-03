@@ -328,31 +328,21 @@ function MapView() {
     const nama = feature.properties?.nama_rute || "Trayek Tanpa Nama";
     const kode = feature.properties?.kode_rute || "-";
     const jenis = feature.properties?.jenis || "-";
-    const tarif = feature.properties?.tarif ? `Rp ${Number(feature.properties.tarif).toLocaleString('id-ID')}` : "N/A";
-    const panjang = feature.properties?.panjang_km ? `${feature.properties.panjang_km} Km` : "-";
-    const estimasi = feature.properties?.estimasi_waktu ? `${feature.properties.estimasi_waktu} Menit` : "-";
-    const ket = feature.properties?.keterangan || "-";
-    const aktif = feature.properties?.aktif !== false ? "Aktif" : "Tidak Aktif";
 
     const popupContent = `
-      <div class="smart-hud-popup" style="font-family: sans-serif; color: white; min-width: 240px;">
-        <h4 style="margin: 0 0 6px 0; color: #06b6d4; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; font-weight: bold; display: flex; justify-content: space-between;">
+      <div class="smart-hud-popup" style="font-family: sans-serif; color: white; min-width: 200px; padding: 12px;">
+        <h4 style="margin: 0 0 10px 0; color: #06b6d4; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 8px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
           <span>🚌 ${nama}</span>
-          <span style="font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">${jenis}</span>
+          <span style="font-size: 10px; font-weight: normal; background: rgba(255,255,255,0.1); padding: 3px 6px; border-radius: 4px;">${jenis}</span>
         </h4>
-        <div style="font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: #cbd5e1;">
-          <div style="display:flex; justify-content:space-between;"><span>Kode Trayek:</span> <strong>${kode}</strong></div>
-          <div style="display:flex; justify-content:space-between;"><span>Jarak Lintasan:</span> <span style="color:#06b6d4;">${panjang}</span></div>
-          <div style="display:flex; justify-content:space-between;"><span>Waktu Tempuh:</span> <span>${estimasi}</span></div>
-          <div style="display:flex; justify-content:space-between;"><span>Tarif:</span> <strong style="color: #10b981;">${tarif}</strong></div>
-          <div style="display:flex; justify-content:space-between;"><span>Status:</span> <strong style="color: ${aktif === 'Aktif' ? '#10b981' : '#f43f5e'};">${aktif}</strong></div>
-          <div style="margin-top: 4px; font-size: 11px; color: #94a3b8; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px; line-height: 1.3; text-align: justify;">
-            <strong>Keterangan:</strong> ${ket}
+        <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px; color: #cbd5e1;">
+          <div style="display:flex; justify-content:space-between;">
+            <span>Kode Trayek:</span> 
+            <strong style="color: #10b981;">${kode}</strong>
           </div>
         </div>
       </div>
     `;
-    
     layer.bindPopup(popupContent, { maxWidth: 300 });
 
     layer.on({
@@ -363,6 +353,19 @@ function MapView() {
         setFocusedRoute(prev => prev === nama ? null : nama);
       }
     });
+
+    if (focusedRoute === nama) {
+      setTimeout(() => {
+        if (layer && layer._map) {
+          // Cari titik tengah rute untuk memunculkan pop-up
+          if (layer.getBounds) {
+            layer.openPopup(layer.getBounds().getCenter());
+          } else {
+            layer.openPopup();
+          }
+        }
+      }, 250); 
+    }
   };
 
   const onEachWisataFeature = (feature, layer) => {
