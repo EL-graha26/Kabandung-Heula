@@ -1,354 +1,164 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, Lock, X, Eye, EyeOff, MapPin } from "lucide-react";
+import {
+  ArrowRight,
+  Lock,
+  X,
+  Eye,
+  EyeOff,
+  MapPin,
+  Bus,
+  Users,
+} from "lucide-react";
 import "./Splash.css";
 
-// Local assets
-import kotaBandung from "../assets/asset_bandung/hero/kota bandung.png";
+import backgroundGedung from "../assets/asset_bandung/hero/gedung sate_2.png";
 import kabut from "../assets/asset_bandung/ornamen/Kabut.png";
-import gedungSate from "../assets/asset_bandung/hero/gedung sate_3.jpg";
-import daunOrnamen from "../assets/asset_bandung/ornamen/DAUN ORNAMEN.png";
 
 export default function Splash() {
   const navigate = useNavigate();
 
-  // Phase: 'loading' | 'welcome'
-  const [phase, setPhase] = useState("loading");
-  const [progress, setProgress] = useState(0);
+  const [phase, setPhase] = useState("splash");
   const [fadeOut, setFadeOut] = useState(false);
-
-  // Login modal
   const [showLogin, setShowLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loginError, setLoginError] = useState("");
 
-  // Counter animation
-  const [counters, setCounters] = useState({ halte: 0, rute: 0, wisata: 0 });
-
-  const startTime = useRef(Date.now());
-
-  /* -------------------------------------------------------
-     LOADING PHASE
-     Dynamic timing: Math.max(1800ms, assetsLoaded)
-  ------------------------------------------------------- */
+  // tahan splash screen sebentar lalu masuk halaman utama
   useEffect(() => {
-    let currentProg = 0;
-    let rafId;
+    const timer = setTimeout(() => {
+      setFadeOut(true);
+      setTimeout(() => setPhase("welcome"), 500); // durasi animasi memudar
+    }, 1200); // tampil selama 1.2 detik
 
-    const tick = () => {
-      // Organic progress: fast at start, slows near 100
-      const remaining = 100 - currentProg;
-      const increment = Math.random() * (remaining * 0.15) + 1;
-      currentProg = Math.min(currentProg + increment, 99);
-      setProgress(currentProg);
-
-      if (currentProg < 99) {
-        // Schedule next tick with variable delay (80–180ms)
-        const delay = 80 + Math.random() * 100;
-        const timer = setTimeout(() => {
-          rafId = requestAnimationFrame(tick);
-        }, delay);
-        rafId = timer;
-      }
-    };
-
-    rafId = requestAnimationFrame(tick);
-
-    // Ensure minimum display time before transitioning
-    const minDisplayTimer = setTimeout(() => {
-      // Snap to 100% and transition out
-      setProgress(100);
-
-      const elapsed = Date.now() - startTime.current;
-      const remaining = Math.max(0, 1800 - elapsed);
-
-      setTimeout(() => {
-        setFadeOut(true);
-        // Wait for fade-out animation, then switch phase
-        setTimeout(() => {
-          setPhase("welcome");
-        }, 500);
-      }, remaining);
-    }, 1800);
-
-    return () => {
-      clearTimeout(minDisplayTimer);
-      if (typeof rafId === "number") {
-        clearTimeout(rafId);
-        cancelAnimationFrame(rafId);
-      }
-    };
+    return () => clearTimeout(timer);
   }, []);
 
-  /* -------------------------------------------------------
-     COUNTER ANIMATION — runs when welcome screen appears
-  ------------------------------------------------------- */
-  useEffect(() => {
-    if (phase !== "welcome") return;
-
-    const targets = { halte: 59, rute: 20, wisata: 50 };
-    const duration = 1400; // ms
-    const fps = 60;
-    const totalSteps = Math.round((duration / 1000) * fps);
-    let step = 0;
-
-    const timer = setInterval(() => {
-      step++;
-      const t = step / totalSteps;
-      // Ease-out cubic
-      const eased = 1 - Math.pow(1 - t, 3);
-
-      setCounters({
-        halte: Math.round(eased * targets.halte),
-        rute: Math.round(eased * targets.rute),
-        wisata: Math.round(eased * targets.wisata),
-      });
-
-      if (step >= totalSteps) clearInterval(timer);
-    }, duration / totalSteps);
-
-    return () => clearInterval(timer);
-  }, [phase]);
-
-  /* -------------------------------------------------------
-     HANDLERS
-  ------------------------------------------------------- */
-  const handleExplore = () => navigate("/home");
+  const closeLogin = () => setShowLogin(false);
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    // Simulasi — tidak ada perubahan backend
     setLoginError("");
-    setShowLogin(false);
+    closeLogin();
     navigate("/home");
   };
 
-  /* -------------------------------------------------------
-     RENDER: SPLASH / LOADING
-  ------------------------------------------------------- */
-  if (phase === "loading") {
+  // layar splash awal
+  if (phase === "splash") {
     return (
       <div className={`splash-screen${fadeOut ? " splash-fade-out" : ""}`}>
-        {/* Background city drone view */}
-        <img
-          src={kotaBandung}
-          alt="Aerial view of Bandung city"
-          className="splash-bg"
-        />
-
-        {/* Atmospheric fog overlay */}
-        <img
-          src={kabut}
-          alt=""
-          className="splash-fog animate-fog"
-          aria-hidden="true"
-        />
-
-        {/* Dark gradient overlay */}
+        <img src={backgroundGedung} alt="Bandung" className="splash-bg" />
         <div className="splash-overlay" aria-hidden="true" />
+        <img src={kabut} alt="" className="splash-fog" aria-hidden="true" />
 
-        {/* Center content */}
-        <div className="splash-content animate-fade-up">
-          {/* Logo icon */}
-          <div className="splash-logo">
-            <div className="splash-logo-icon">
-              <MapPin size={28} color="white" />
-            </div>
+        <div className="splash-content">
+          <div className="splash-logo-icon">
+            <MapPin size={38} color="#10b981" strokeWidth={2.5} />
           </div>
-
-          {/* Brand name */}
           <h1 className="splash-title">
-            Kabandung
+            <span className="splash-title-main">Kabandung</span>
             <span className="splash-title-accent">Heula</span>
           </h1>
-
-          <p className="splash-platform">
-            Smart Mobility &amp; Tourism · Bandung
-          </p>
-
-          {/* Dynamic progress bar */}
-          <div
-            className="splash-progress-track"
-            role="progressbar"
-            aria-valuenow={Math.round(progress)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className="splash-progress-bar"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-
-          <p className="splash-loading-text">
-            Memuat data spasial… {Math.round(progress)}%
-          </p>
         </div>
       </div>
     );
   }
 
-  /* -------------------------------------------------------
-     RENDER: WELCOME SCREEN
-  ------------------------------------------------------- */
+  // layar utama
   return (
-    <div className="welcome-screen animate-fade-in">
-      <div className="welcome-container">
-        {/*  */}
-        <div className="welcome-left animate-fade-left">
-          {/* Platform badge */}
-          <div className="welcome-badge" role="status">
-            <span className="badge-dot" aria-hidden="true" />
-            Platform Resmi WebGIS Kota Bandung
-          </div>
+    <div className="welcome-fullscreen">
+      {/* gambar latar belakang */}
+      <img
+        src={backgroundGedung}
+        alt="Bandung"
+        className="welcome-bg-full"
+        style={{ objectPosition: "60% center" }}
+      />
 
-          {/* Heading */}
-          <h1 className="welcome-title">
-            Selamat Datang di
-            <span className="welcome-title-brand">Kabandung Heula</span>
-          </h1>
+      {/* animasi efek kabut */}
+      <img src={kabut} alt="" className="welcome-fog" aria-hidden="true" />
 
-          {/* Description */}
-          <p className="welcome-desc">
-            Platform WebGIS Interaktif untuk transportasi dan pariwisata Kota
-            Bandung. Jelajahi rute, halte, dan destinasi wisata dalam satu peta
-            yang cerdas dan mudah digunakan.
-          </p>
+      {/* gradien latar untuk teks */}
+      <div className="welcome-gradient-overlay" aria-hidden="true" />
 
-          {/* CTA Buttons */}
-          <div className="welcome-actions">
-            <button
-              id="btn-explore"
-              className="btn-primary welcome-cta"
-              onClick={handleExplore}
-              aria-label="Mulai menjelajahi peta Bandung"
-            >
-              <ArrowRight size={18} aria-hidden="true" />
-              Jelajahi Bandung
-            </button>
+      {/* konten teks & tombol kiri */}
+      <div className="welcome-hero-content animate-fade-left">
+        <h1 className="welcome-hero-title">
+          Selamat Datang di
+          <span className="welcome-hero-brand">Kabandung Heula</span>
+        </h1>
 
-            <button
-              id="btn-admin-login"
-              className="btn-admin"
-              onClick={() => setShowLogin(true)}
-              aria-label="Masuk sebagai administrator"
-            >
-              <Lock size={16} aria-hidden="true" />
-              Masuk Admin
-            </button>
-          </div>
+        <p className="welcome-hero-desc">
+          Platform WebGIS Interaktif untuk Transportasi dan Pariwisata Kota
+          Bandung
+        </p>
 
-          {/* Statistics with counter animation */}
-          <div
-            className="welcome-stats"
-            role="region"
-            aria-label="Statistik platform"
+        {/* aksi utama */}
+        <div className="welcome-hero-actions">
+          <button
+            id="btn-explore"
+            className="hero-cta-btn hero-cta-primary"
+            onClick={() => navigate("/home")}
           >
-            <div className="stat-item">
-              <span className="stat-value" aria-live="polite">
-                {counters.halte}
-              </span>
-              <span className="stat-label">Halte Aktif</span>
-            </div>
+            <span className="hero-btn-icon">
+              <Bus size={20} strokeWidth={2} />
+            </span>
+            <span className="hero-btn-label">
+              <strong>Jelajahi Bandung</strong>
+              <small>Eksplor transportasi &amp; wisata</small>
+            </span>
+            <ArrowRight size={16} />
+          </button>
 
-            <div className="stat-divider" aria-hidden="true" />
-
-            <div className="stat-item">
-              <span className="stat-value" aria-live="polite">
-                {counters.rute}
-              </span>
-              <span className="stat-label">Rute Aktif</span>
-            </div>
-
-            <div className="stat-divider" aria-hidden="true" />
-
-            <div className="stat-item">
-              <span className="stat-value" aria-live="polite">
-                {counters.wisata}+
-              </span>
-              <span className="stat-label">Destinasi Wisata</span>
-            </div>
-
-            <div className="stat-divider" aria-hidden="true" />
-
-            <div className="stat-item">
-              <span className="stat-value">3.5</span>
-              <span className="stat-label">KM Radius</span>
-            </div>
-          </div>
-        </div>
-
-        {/*  */}
-        <div className="welcome-right animate-fade-right delay-200">
-          <div className="welcome-img-wrap">
-            <img
-              src={gedungSate}
-              alt="Gedung Sate, ikon arsitektur Kota Bandung"
-              className="welcome-img"
-            />
-
-            {/* Leaf ornaments */}
-            <img
-              src={daunOrnamen}
-              alt=""
-              className="welcome-leaf-top"
-              aria-hidden="true"
-            />
-            <img
-              src={daunOrnamen}
-              alt=""
-              className="welcome-leaf-bottom"
-              aria-hidden="true"
-            />
-
-            {/* Location badge overlay */}
-            <div
-              className="welcome-img-badge glass-dark"
-              aria-label="Lokasi: Bandung, Jawa Barat"
-            >
-              <MapPin
-                size={13}
-                color="var(--color-accent)"
-                aria-hidden="true"
-              />
-              <span>Bandung, Jawa Barat</span>
-            </div>
-          </div>
+          <button
+            id="btn-admin-login"
+            className="hero-cta-btn hero-cta-secondary"
+            onClick={() => setShowLogin(true)}
+          >
+            <span className="hero-btn-icon hero-btn-icon-lock">
+              <Lock size={20} strokeWidth={2} />
+            </span>
+            <span className="hero-btn-label">
+              <strong>Login Admin</strong>
+              <small>Kelola data &amp; sistem</small>
+            </span>
+          </button>
         </div>
       </div>
 
-      {/*  */}
+      {/* modal form login */}
       {showLogin && (
         <div
           className="modal-overlay"
-          onClick={() => setShowLogin(false)}
+          onClick={closeLogin}
           role="dialog"
           aria-modal="true"
           aria-label="Modal masuk admin"
         >
           <div
-            className="login-modal animate-scale-in"
+            className="login-glass-card animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
+            {/* tombol silang close */}
             <button
-              className="modal-close"
-              onClick={() => setShowLogin(false)}
+              className="modal-close-x"
+              onClick={closeLogin}
               aria-label="Tutup modal"
             >
-              <X size={18} />
+              <X size={15} />
             </button>
 
-            {/* Header */}
+            {/* judul form */}
             <div className="modal-header">
               <div className="modal-icon" aria-hidden="true">
-                <Lock size={22} color="var(--color-primary)" />
+                <Lock size={22} color="#10b981" />
               </div>
               <h2>Masuk ke Dashboard</h2>
               <p>Gunakan akun admin untuk mengelola sistem</p>
             </div>
 
-            {/* Form */}
+            {/* area form input */}
             <form
               onSubmit={handleLoginSubmit}
               className="modal-form"
@@ -382,65 +192,52 @@ export default function Splash() {
                     className="password-toggle"
                     onClick={() => setShowPassword((p) => !p)}
                     aria-label={
-                      showPassword
-                        ? "Sembunyikan password"
-                        : "Tampilkan password"
+                      showPassword ? "Sembunyikan" : "Tampilkan password"
                     }
                   >
-                    {showPassword ? (
-                      <EyeOff size={16} aria-hidden="true" />
-                    ) : (
-                      <Eye size={16} aria-hidden="true" />
-                    )}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
-              {loginError && (
-                <p
-                  style={{
-                    color: "var(--color-error)",
-                    fontSize: "var(--text-sm)",
-                    marginTop: "-8px",
-                  }}
-                >
-                  {loginError}
-                </p>
-              )}
+              <div className="login-row-extras">
+                <label className="remember-me">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={() => setRememberMe((r) => !r)}
+                  />
+                  <span>Ingat saya</span>
+                </label>
+                <button type="button" className="forgot-password">
+                  Lupa Password?
+                </button>
+              </div>
 
-              <button
-                type="submit"
-                className="btn-primary"
-                style={{
-                  width: "100%",
-                  justifyContent: "center",
-                  marginTop: "var(--space-2)",
-                }}
-              >
-                Masuk
+              {loginError && <p className="login-error-msg">{loginError}</p>}
+
+              <button type="submit" className="btn-login-submit">
+                Masuk <ArrowRight size={16} />
               </button>
 
-              <div style={{ textAlign: "center", marginTop: "var(--space-2)" }}>
-                <span
-                  style={{
-                    fontSize: "var(--text-xs)",
-                    color: "var(--color-text-light)",
-                  }}
-                >
-                  atau
-                </span>
+              <div className="modal-divider">
+                <span>atau</span>
               </div>
 
               <button
                 type="button"
                 className="btn-tamu"
                 onClick={() => {
-                  setShowLogin(false);
+                  closeLogin();
                   navigate("/home");
                 }}
               >
-                Eksplorasi Sebagai Tamu
+                <Users size={15} /> Eksplorasi Sebagai Tamu
               </button>
+
+              <p className="login-tamu-note">
+                Nikmati peta dan informasi tanpa login
+              </p>
             </form>
           </div>
         </div>

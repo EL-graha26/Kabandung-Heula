@@ -2,10 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Map, Menu, X, ChevronRight } from "lucide-react";
 
-/* -----------------------------------------------------------
-   Navbar — Floating Glass Pill, Scroll-Aware
-   Transparent on top → white glass on scroll
------------------------------------------------------------ */
+// Navbar
 export default function Navbar() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
@@ -13,14 +10,12 @@ export default function Navbar() {
   const [activeLink, setActiveLink] = useState("");
   const navRef = useRef(null);
 
-  /* Scroll listener — switches glass style at 40px */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Close mobile menu on outside click */
   useEffect(() => {
     if (!menuOpen) return;
     const handler = (e) => {
@@ -32,12 +27,11 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
 
-  /* Close mobile menu on route change */
   useEffect(() => {
     setMenuOpen(false);
   }, []);
 
-  /* Intersection Observer — highlight active section */
+
   useEffect(() => {
     const sections = ["hero", "transportasi", "wisata", "peta", "tentang"];
     const observers = sections
