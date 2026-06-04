@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Map, Menu, X, ChevronRight } from "lucide-react";
+import { Map, Menu, X, ChevronRight, MapPin } from "lucide-react";
 
 // Navbar
 export default function Navbar() {
@@ -11,7 +11,14 @@ export default function Navbar() {
   const navRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+      
+      // Auto-select footer if scrolled to bottom
+      if (window.innerHeight + Math.round(window.scrollY) >= document.body.offsetHeight - 50) {
+        setActiveLink("footer");
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -33,7 +40,7 @@ export default function Navbar() {
 
 
   useEffect(() => {
-    const sections = ["hero", "transportasi", "wisata", "peta", "tentang"];
+    const sections = ["hero", "map-preview", "transportasi", "wisata", "footer"];
     const observers = sections
       .map((id) => {
         const el = document.getElementById(id);
@@ -42,7 +49,7 @@ export default function Navbar() {
           ([entry]) => {
             if (entry.isIntersecting) setActiveLink(id);
           },
-          { threshold: 0.4 },
+          { rootMargin: "-30% 0px -60% 0px" }
         );
         obs.observe(el);
         return obs;
@@ -54,10 +61,10 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Beranda", href: "#hero" },
+    { label: "Peta Interaktif", href: "#map-preview" },
     { label: "Transportasi", href: "#transportasi" },
     { label: "Wisata", href: "#wisata" },
-    { label: "Peta Interaktif", href: "#peta" },
-    { label: "Tentang", href: "#tentang" },
+    { label: "Kontak", href: "#footer" },
   ];
 
   const handleNav = (href) => {
@@ -87,27 +94,10 @@ export default function Navbar() {
           aria-label="Kembali ke beranda Kabandung Heula"
         >
           <div className="kh-nav-logo-icon" aria-hidden="true">
-            {/* Leaf/shield icon */}
-            <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-              <path
-                d="M12 2.5C9 4.5 4.5 6 4.5 11C4.5 15.5 7.5 19.5 12 21.5C16.5 19.5 19.5 15.5 19.5 11C19.5 6 15 4.5 12 2.5Z"
-                fill="currentColor"
-                opacity="0.15"
-              />
-              <path
-                d="M12 2.5C9 4.5 4.5 6 4.5 11C4.5 15.5 7.5 19.5 12 21.5C16.5 19.5 19.5 15.5 19.5 11C19.5 6 15 4.5 12 2.5Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                fill="none"
-              />
-              <circle cx="12" cy="11.5" r="2.5" fill="currentColor" />
-            </svg>
+            <MapPin size={20} strokeWidth={2.5} />
           </div>
           <div className="kh-nav-logo-text">
             <span className="kh-nav-logo-name">Kabandung Heula</span>
-            <span className="kh-nav-logo-sub">
-              Smart Mobility &amp; Tourism
-            </span>
           </div>
         </button>
 

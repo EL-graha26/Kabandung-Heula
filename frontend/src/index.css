@@ -1,243 +1,155 @@
-/* ============================================================
-   KABANDUNG HEULA — PREMIUM TOURISM DESIGN SYSTEM
-   Sprint 1: Global Styles & Design Tokens
-   
-   Nature-Inspired Smart Tourism Platform
-   Kota Bandung, Jawa Barat
-   ============================================================ */
-
-/* ============================================================
-   GOOGLE FONTS — Typography Foundation
-   Poppins : Brand heading, ExtraBold 800 / Bold 700
-   Inter   : Body text, reading comfort
-   ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
-
-/* ============================================================
-   DESIGN TOKENS — CSS Custom Properties
-   ============================================================ */
+/* === BAGIAN 1: PENGATURAN WARNA UTAMA ===
+Di sini kita nyimpen semua kode warna biar gampang diganti */
 :root {
-
-  /* ----------------------------------------------------------
-     COLOR SYSTEM — Primary Palette
-     ---------------------------------------------------------- */
-  --color-primary:        #2F6B52;   /* Forest Green — CTA, heading accent        */
-  --color-primary-hover:  #256045;   /* Darker green — hover state                */
-  --color-primary-light:  #4A8A6B;   /* Lighter green — secondary interaction     */
-  --color-secondary:      #3FAF7B;   /* Emerald — progress, toggle active         */
-  --color-secondary-hover:#34976A;   /* Darker emerald — hover on secondary       */
-  --color-dark:           #18392B;   /* Deep Forest — dark sections, footer bg    */
-  --color-dark-soft:      #1E4533;   /* Slightly lighter dark — sub-sections      */
-  --color-accent:         #D8B15C;   /* Gold — badge, divider, highlight          */
-  --color-accent-light:   #E8C97A;   /* Light gold — hover on accent elements     */
-  --color-sage:           #DDEAD7;   /* Sage Green — subtle bg, card alt bg       */
-  --color-sage-dark:      #C8DABC;   /* Darker sage — borders on light sections   */
-
-  /* ----------------------------------------------------------
-     COLOR SYSTEM — Background Palette
-     ---------------------------------------------------------- */
-  --color-bg:             #F8F7F3;   /* Warm Cream — main page background         */
-  --color-bg-alt:         #F1F0EB;   /* Slightly darker cream — section alt       */
-  --color-bg-sage:        #EDF3E8;   /* Sage tinted bg — feature sections         */
-  --color-surface:        #FFFFFF;   /* Pure white — card surfaces                */
-  --color-surface-warm:   #FDFCF8;   /* Warm white — inner card surfaces          */
-
-  /* ----------------------------------------------------------
-     COLOR SYSTEM — Text Palette
-     ---------------------------------------------------------- */
-  --color-text:           #1A2E22;   /* Very dark green — main body text          */
-  --color-text-strong:    #0F1F17;   /* Near black — headings, emphasis           */
-  --color-text-muted:     #6B7F73;   /* Muted sage — secondary text, captions     */
-  --color-text-light:     #A8B8AF;   /* Light sage — placeholder, disabled        */
-  --color-text-inverse:   #F8F7F3;   /* Cream — text on dark backgrounds          */
-  --color-text-accent:    #D8B15C;   /* Gold — special labels on dark bg          */
-
-  /* ----------------------------------------------------------
-     COLOR SYSTEM — Transport Mode Tokens
-     Semantic colors per moda transportasi
-     ---------------------------------------------------------- */
-  --color-tmb:            #2F6B52;   /* Trans Metro Bandung — Forest Green        */
-  --color-tmb-light:      rgba(47, 107, 82, 0.12);
-  --color-tmb-border:     rgba(47, 107, 82, 0.35);
-
-  --color-bandros:        #2980B9;   /* Bandros Bus Wisata — Ocean Blue           */
-  --color-bandros-light:  rgba(41, 128, 185, 0.12);
+  --color-primary: #2F6B52;
+  --color-primary-hover: #256045;
+  --color-primary-light: #4A8A6B;
+  --color-secondary: #3FAF7B;
+  --color-secondary-hover: #34976A;
+  --color-dark: #18392B;
+  --color-dark-soft: #1E4533;
+  --color-accent: #D8B15C;
+  --color-accent-light: #E8C97A;
+  --color-sage: #DDEAD7;
+  --color-sage-dark: #C8DABC;
+  --color-bg: #F8F7F3;
+  --color-bg-alt: #F1F0EB;
+  --color-bg-sage: #EDF3E8;
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #FDFCF8;
+  --color-text: #1A2E22;
+  --color-text-strong: #0F1F17;
+  --color-text-muted: #6B7F73;
+  --color-text-light: #A8B8AF;
+  --color-text-inverse: #F8F7F3;
+  --color-text-accent: #D8B15C;
+  --color-tmb: #2F6B52;
+  --color-tmb-light: rgba(47, 107, 82, 0.12);
+  --color-tmb-border: rgba(47, 107, 82, 0.35);
+  --color-bandros: #2980B9;
+  --color-bandros-light: rgba(41, 128, 185, 0.12);
   --color-bandros-border: rgba(41, 128, 185, 0.35);
-
-  --color-angkot:         #D8B15C;   /* Angkutan Kota — Gold/Amber                */
-  --color-angkot-light:   rgba(216, 177, 92, 0.12);
-  --color-angkot-border:  rgba(216, 177, 92, 0.35);
-
-  /* Route line colors on the map */
-  --route-tmb:            #2F6B52;
-  --route-bandros:        #3B82F6;
-  --route-angkot:         #D97706;
-
-  /* Wisata polygon overlay */
-  --color-wisata:         #E74C3C;
-  --color-wisata-light:   rgba(231, 76, 60, 0.15);
-  --color-wisata-border:  rgba(231, 76, 60, 0.40);
-
-  /* ----------------------------------------------------------
-     COLOR SYSTEM — Distance Badge Tokens
-     Untuk label jarak wisata dari halte
-     ---------------------------------------------------------- */
-  --badge-near-bg:        rgba(63, 175, 123, 0.15);  /* < 500m   — Emerald tint  */
-  --badge-near-color:     #2F6B52;
-  --badge-near-border:    rgba(63, 175, 123, 0.40);
-
-  --badge-mid-bg:         rgba(216, 177, 92, 0.15);  /* 500m–1km — Gold tint     */
-  --badge-mid-color:      #9A7A30;
-  --badge-mid-border:     rgba(216, 177, 92, 0.40);
-
-  --badge-far-bg:         rgba(107, 127, 115, 0.12); /* > 1km    — Muted tint    */
-  --badge-far-color:      #6B7F73;
-  --badge-far-border:     rgba(107, 127, 115, 0.30);
-
-  /* Radius indicator */
-  --badge-radius-bg:      rgba(47, 107, 82, 0.10);
-  --badge-radius-color:   #2F6B52;
-  --badge-radius-border:  rgba(47, 107, 82, 0.25);
-
-  /* ----------------------------------------------------------
-     GLASSMORPHISM TOKENS — Light Theme
-     82% opacity glass (approved revision)
-     ---------------------------------------------------------- */
-  --glass-bg:             rgba(255, 255, 255, 0.82);
-  --glass-bg-soft:        rgba(255, 255, 255, 0.65);
-  --glass-bg-sage:        rgba(221, 234, 215, 0.82);
-  --glass-bg-dark:        rgba(24, 57, 43, 0.82);    /* Dark sections            */
-  --glass-bg-dark-soft:   rgba(24, 57, 43, 0.65);
-  --glass-border:         rgba(255, 255, 255, 0.55);
-  --glass-border-sage:    rgba(47, 107, 82, 0.18);
-  --glass-border-dark:    rgba(255, 255, 255, 0.12);
-  --glass-blur:           blur(18px);
-  --glass-blur-light:     blur(10px);
-
-  /* ----------------------------------------------------------
-     SHADOW SYSTEM — Soft, Nature-Inspired
-     Keyed from --color-primary (Forest Green)
-     Lighter than previous version (approved revision)
-     ---------------------------------------------------------- */
-  --shadow-xs:   0 1px 4px  rgba(47, 107, 82, 0.06);
-  --shadow-sm:   0 2px 10px rgba(47, 107, 82, 0.08);
-  --shadow-md:   0 4px 20px rgba(47, 107, 82, 0.10);
-  --shadow-lg:   0 8px 32px rgba(47, 107, 82, 0.12);
-  --shadow-xl:   0 16px 48px rgba(47, 107, 82, 0.14);
-  --shadow-2xl:  0 24px 64px rgba(47, 107, 82, 0.16);
+  --color-angkot: #D8B15C;
+  --color-angkot-light: rgba(216, 177, 92, 0.12);
+  --color-angkot-border: rgba(216, 177, 92, 0.35);
+  --route-tmb: #2F6B52;
+  --route-bandros: #3B82F6;
+  --route-angkot: #D97706;
+  --color-wisata: #E74C3C;
+  --color-wisata-light: rgba(231, 76, 60, 0.15);
+  --color-wisata-border: rgba(231, 76, 60, 0.40);
+  --badge-near-bg: rgba(63, 175, 123, 0.15);
+  --badge-near-color: #2F6B52;
+  --badge-near-border: rgba(63, 175, 123, 0.40);
+  --badge-mid-bg: rgba(216, 177, 92, 0.15);
+  --badge-mid-color: #9A7A30;
+  --badge-mid-border: rgba(216, 177, 92, 0.40);
+  --badge-far-bg: rgba(107, 127, 115, 0.12);
+  --badge-far-color: #6B7F73;
+  --badge-far-border: rgba(107, 127, 115, 0.30);
+  --badge-radius-bg: rgba(47, 107, 82, 0.10);
+  --badge-radius-color: #2F6B52;
+  --badge-radius-border: rgba(47, 107, 82, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-bg-soft: rgba(255, 255, 255, 0.65);
+  --glass-bg-sage: rgba(221, 234, 215, 0.82);
+  --glass-bg-dark: rgba(24, 57, 43, 0.82);
+  --glass-bg-dark-soft: rgba(24, 57, 43, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --glass-border-sage: rgba(47, 107, 82, 0.18);
+  --glass-border-dark: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(18px);
+  --glass-blur-light: blur(10px);
+  --shadow-xs: 0 1px 4px  rgba(47, 107, 82, 0.06);
+  --shadow-sm: 0 2px 10px rgba(47, 107, 82, 0.08);
+  --shadow-md: 0 4px 20px rgba(47, 107, 82, 0.10);
+  --shadow-lg: 0 8px 32px rgba(47, 107, 82, 0.12);
+  --shadow-xl: 0 16px 48px rgba(47, 107, 82, 0.14);
+  --shadow-2xl: 0 24px 64px rgba(47, 107, 82, 0.16);
   --shadow-card: 0 4px 24px rgba(47, 107, 82, 0.10), 0 1px 4px rgba(0, 0, 0, 0.03);
   --shadow-card-hover: 0 12px 40px rgba(47, 107, 82, 0.16), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-btn:  0 4px 14px rgba(47, 107, 82, 0.22);
+  --shadow-btn: 0 4px 14px rgba(47, 107, 82, 0.22);
   --shadow-btn-hover: 0 8px 24px rgba(47, 107, 82, 0.30);
-
-  /* ----------------------------------------------------------
-     BORDER RADIUS SYSTEM
-     ---------------------------------------------------------- */
-  --radius-xs:   4px;
-  --radius-sm:   8px;
-  --radius-md:   12px;
-  --radius-lg:   20px;
-  --radius-xl:   28px;
-  --radius-2xl:  36px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
   --radius-pill: 100px;
-
-  /* ----------------------------------------------------------
-     TYPOGRAPHY SYSTEM
-     ---------------------------------------------------------- */
   --font-heading: 'Poppins', system-ui, sans-serif;
-  --font-body:    'Inter', system-ui, sans-serif;
-
-  /* Fluid type scale — clamp(min, preferred, max) */
-  --text-xs:    clamp(11px, 1.2vw, 12px);
-  --text-sm:    clamp(13px, 1.4vw, 14px);
-  --text-base:  clamp(15px, 1.6vw, 16px);
-  --text-lg:    clamp(17px, 1.8vw, 18px);
-  --text-xl:    clamp(19px, 2vw,   20px);
-  --text-2xl:   clamp(22px, 2.4vw, 24px);
-  --text-3xl:   clamp(28px, 3vw,   32px);
-  --text-4xl:   clamp(36px, 4vw,   48px);
-  --text-5xl:   clamp(48px, 5.5vw, 64px);
-
-  /* Hero font — fluid, NOT fixed (approved revision) */
-  --text-hero:  clamp(48px, 7vw, 88px);
+  --font-body: 'Inter', system-ui, sans-serif;
+  --text-xs: clamp(11px, 1.2vw, 12px);
+  --text-sm: clamp(13px, 1.4vw, 14px);
+  --text-base: clamp(15px, 1.6vw, 16px);
+  --text-lg: clamp(17px, 1.8vw, 18px);
+  --text-xl: clamp(19px, 2vw,   20px);
+  --text-2xl: clamp(22px, 2.4vw, 24px);
+  --text-3xl: clamp(28px, 3vw,   32px);
+  --text-4xl: clamp(36px, 4vw,   48px);
+  --text-5xl: clamp(48px, 5.5vw, 64px);
+  --text-hero: clamp(48px, 7vw, 88px);
   --text-hero-sm: clamp(36px, 5.5vw, 64px);
-
-  /* Line heights */
-  --leading-tight:  1.15;
-  --leading-snug:   1.3;
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
   --leading-normal: 1.5;
-  --leading-relaxed:1.7;
-
-  /* Letter spacings */
-  --tracking-tight:  -0.03em;
-  --tracking-snug:   -0.01em;
+  --leading-relaxed: 1.7;
+  --tracking-tight: -0.03em;
+  --tracking-snug: -0.01em;
   --tracking-normal: 0;
-  --tracking-wide:   0.03em;
-  --tracking-wider:  0.08em;
+  --tracking-wide: 0.03em;
+  --tracking-wider: 0.08em;
   --tracking-widest: 0.15em;
-
-  /* ----------------------------------------------------------
-     SPACING SYSTEM
-     ---------------------------------------------------------- */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
   --space-24: 96px;
   --space-32: 128px;
-
   --section-padding-y: clamp(64px, 8vw, 100px);
   --section-padding-x: clamp(20px, 5vw, 80px);
   --max-width: 1280px;
   --max-width-content: 1100px;
-
-  /* ----------------------------------------------------------
-     ANIMATION TIMING TOKENS
-     ---------------------------------------------------------- */
-  --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
-  --ease-bounce:  cubic-bezier(0.34, 1.56, 0.64, 1);
-
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --dur-instant: 100ms;
-  --dur-fast:    200ms;
-  --dur-base:    350ms;
-  --dur-slow:    600ms;
-  --dur-slower:  900ms;
+  --dur-fast: 200ms;
+  --dur-base: 350ms;
+  --dur-slow: 600ms;
+  --dur-slower: 900ms;
   --dur-slowest: 1200ms;
-
-  /* ----------------------------------------------------------
-     Z-INDEX SCALE
-     ---------------------------------------------------------- */
-  --z-below:    -1;
-  --z-base:      0;
-  --z-raised:   10;
+  --z-below: -1;
+  --z-base: 0;
+  --z-raised: 10;
   --z-dropdown: 100;
-  --z-sticky:   200;
-  --z-overlay:  500;
-  --z-modal:    900;
-  --z-toast:    1000;
-  --z-navbar:   9999;
+  --z-sticky: 200;
+  --z-overlay: 500;
+  --z-modal: 900;
+  --z-toast: 1000;
+  --z-navbar: 9999;
 }
 
-
-/* ============================================================
-   RESET & BASE STYLES
-   ============================================================ */
+/* === BAGIAN 2: RESET DESAIN ===
+Biar tampilannya seragam di semua jenis browser */
+/* Reset semua jarak bawaan browser biar webnya rapi dari nol */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Ngatur fondasi dasar web (warna background utama, ukuran layar) */
 html {
   scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
@@ -245,6 +157,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Ngatur fondasi dasar web (warna background utama, ukuran layar) */
 body {
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -260,7 +173,8 @@ body {
   min-height: 100vh;
 }
 
-img, video {
+img,
+video {
   max-width: 100%;
   display: block;
 }
@@ -275,16 +189,15 @@ button {
   cursor: pointer;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: var(--font-body);
 }
 
-
-/* ============================================================
-   TYPOGRAPHY UTILITIES
-   ============================================================ */
-
-/* Heading elements — Poppins */
+/* === BAGIAN 3: PENGATURAN TEKS (HURUF) ===
+Ngatur ukuran dan bentuk huruf di web */
+/* Ngatur jenis, ukuran, dan ketebalan huruf teks */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--color-text-strong);
@@ -292,80 +205,20 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: var(--tracking-snug);
 }
 
-/* Body elements — Inter */
-p, span, li, label, input, textarea, select, button {
+p,
+span,
+li,
+label,
+input,
+textarea,
+select,
+button {
   font-family: var(--font-body);
 }
 
-/* Fluid hero heading */
-.text-hero {
-  font-family: var(--font-heading);
-  font-size: var(--text-hero);
-  font-weight: 800;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-}
-
-.text-hero-sm {
-  font-family: var(--font-heading);
-  font-size: var(--text-hero-sm);
-  font-weight: 800;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-}
-
-.text-section-title {
-  font-family: var(--font-heading);
-  font-size: var(--text-4xl);
-  font-weight: 700;
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-snug);
-  color: var(--color-text-strong);
-}
-
-.text-section-sub {
-  font-family: var(--font-body);
-  font-size: var(--text-lg);
-  color: var(--color-text-muted);
-  line-height: var(--leading-relaxed);
-}
-
-/* Text color utilities */
-.text-primary   { color: var(--color-primary) !important; }
-.text-secondary { color: var(--color-secondary) !important; }
-.text-accent    { color: var(--color-accent) !important; }
-.text-muted     { color: var(--color-text-muted) !important; }
-.text-inverse   { color: var(--color-text-inverse) !important; }
-.text-dark      { color: var(--color-dark) !important; }
-
-/* Gradient text */
-.text-gradient-green {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-gradient-gold {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-gradient-nature {
-  background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-primary) 50%, var(--color-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-
-/* ============================================================
-   GLASSMORPHISM UTILITY CLASSES — Light Theme
-   ============================================================ */
-
-/* Standard glass — warm white, 82% opacity */
+/* === BAGIAN 4: EFEK KACA (GLASSMORPHISM) ===
+Ini yang bikin kotak keliatan transparan kayak kaca buram */
+/* Ngatur efek kaca buram tembus pandang (glassmorphism) */
 .glass {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -375,47 +228,7 @@ p, span, li, label, input, textarea, select, button {
   box-shadow: var(--shadow-card);
 }
 
-/* Soft glass — slightly more transparent */
-.glass-soft {
-  background: var(--glass-bg-soft);
-  backdrop-filter: var(--glass-blur-light);
-  -webkit-backdrop-filter: var(--glass-blur-light);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Sage-tinted glass — for nature sections */
-.glass-sage {
-  background: var(--glass-bg-sage);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-sage);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
-/* Dark glass — for overlays on dark backgrounds */
-.glass-dark {
-  background: var(--glass-bg-dark);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-dark);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Dark soft glass */
-.glass-dark-soft {
-  background: var(--glass-bg-dark-soft);
-  backdrop-filter: var(--glass-blur-light);
-  -webkit-backdrop-filter: var(--glass-blur-light);
-  border: 1px solid var(--glass-border-dark);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-}
-
-/* Interactive glass card (replaces old .glass-card) */
+/* Ngatur efek kaca buram tembus pandang (glassmorphism) */
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -424,34 +237,19 @@ p, span, li, label, input, textarea, select, button {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition:
-    transform var(--dur-base) var(--ease-spring),
+  transition: transform var(--dur-base) var(--ease-spring),
     box-shadow var(--dur-base) var(--ease-smooth),
     border-color var(--dur-base) var(--ease-smooth);
 }
 
+/* Ngatur efek kaca buram tembus pandang (glassmorphism) */
 .glass-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-card-hover);
   border-color: var(--glass-border-sage);
 }
 
-/* Old class alias — prevent breaking existing markup during transition */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-sage);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
-
-/* ============================================================
-   BUTTON SYSTEM
-   ============================================================ */
-
-/* Primary button — Forest Green */
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -467,26 +265,27 @@ p, span, li, label, input, textarea, select, button {
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-btn);
   cursor: pointer;
-  transition:
-    background-color var(--dur-fast) var(--ease-smooth),
+  transition: background-color var(--dur-fast) var(--ease-smooth),
     transform var(--dur-fast) var(--ease-spring),
     box-shadow var(--dur-fast) var(--ease-smooth);
   white-space: nowrap;
   letter-spacing: var(--tracking-wide);
 }
 
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-primary:hover {
   background: var(--color-primary-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-btn-hover);
 }
 
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-primary:active {
   transform: translateY(0px);
   box-shadow: var(--shadow-btn);
 }
 
-/* Secondary button — ghost with green border */
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -501,47 +300,20 @@ p, span, li, label, input, textarea, select, button {
   border: 1.5px solid var(--color-primary);
   border-radius: var(--radius-pill);
   cursor: pointer;
-  transition:
-    background-color var(--dur-fast) var(--ease-smooth),
+  transition: background-color var(--dur-fast) var(--ease-smooth),
     color var(--dur-fast) var(--ease-smooth),
     transform var(--dur-fast) var(--ease-spring);
   white-space: nowrap;
 }
 
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-secondary:hover {
   background: var(--color-primary);
   color: #FFFFFF;
   transform: translateY(-2px);
 }
 
-/* Inverse button — white on dark backgrounds */
-.btn-inverse {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 14px 32px;
-  background: #FFFFFF;
-  color: var(--color-primary);
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  font-weight: 700;
-  border: none;
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-  transition:
-    transform var(--dur-fast) var(--ease-spring),
-    box-shadow var(--dur-fast) var(--ease-smooth);
-  white-space: nowrap;
-}
-
-.btn-inverse:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Icon button — circular */
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-icon {
   display: inline-flex;
   align-items: center;
@@ -553,24 +325,19 @@ p, span, li, label, input, textarea, select, button {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition:
-    background var(--dur-fast) var(--ease-smooth),
+  transition: background var(--dur-fast) var(--ease-smooth),
     transform var(--dur-fast) var(--ease-spring),
     box-shadow var(--dur-fast) var(--ease-smooth);
 }
 
+/* Ngatur tombol-tombol di web biar kelihatan cakep pas diklik/disentuh */
 .btn-icon:hover {
   background: var(--color-sage);
   transform: scale(1.05);
   box-shadow: var(--shadow-md);
 }
 
-
-/* ============================================================
-   BADGE / TAG SYSTEM
-   ============================================================ */
-
-/* Base badge */
+/* Ngatur bentuk dan warna komponen badge */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -585,90 +352,7 @@ p, span, li, label, input, textarea, select, button {
   white-space: nowrap;
 }
 
-/* Transport badges */
-.badge-tmb {
-  background: var(--color-tmb-light);
-  color: var(--color-tmb);
-  border: 1px solid var(--color-tmb-border);
-}
-
-.badge-bandros {
-  background: var(--color-bandros-light);
-  color: var(--color-bandros);
-  border: 1px solid var(--color-bandros-border);
-}
-
-.badge-angkot {
-  background: var(--color-angkot-light);
-  color: #8B6914;
-  border: 1px solid var(--color-angkot-border);
-}
-
-.badge-wisata {
-  background: var(--color-wisata-light);
-  color: var(--color-wisata);
-  border: 1px solid var(--color-wisata-border);
-}
-
-/* Distance badges */
-.badge-distance {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.badge-distance-near {
-  background: var(--badge-near-bg);
-  color: var(--badge-near-color);
-  border: 1px solid var(--badge-near-border);
-}
-
-.badge-distance-mid {
-  background: var(--badge-mid-bg);
-  color: var(--badge-mid-color);
-  border: 1px solid var(--badge-mid-border);
-}
-
-.badge-distance-far {
-  background: var(--badge-far-bg);
-  color: var(--badge-far-color);
-  border: 1px solid var(--badge-far-border);
-}
-
-.badge-radius {
-  background: var(--badge-radius-bg);
-  color: var(--badge-radius-color);
-  border: 1px solid var(--badge-radius-border);
-  font-size: var(--text-xs);
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-}
-
-/* Status badges */
-.badge-active {
-  background: rgba(63, 175, 123, 0.12);
-  color: #2F6B52;
-  border: 1px solid rgba(63, 175, 123, 0.35);
-}
-
-.badge-inactive {
-  background: rgba(192, 57, 43, 0.10);
-  color: #C0392B;
-  border: 1px solid rgba(192, 57, 43, 0.25);
-}
-
-
-/* ============================================================
-   LAYOUT UTILITIES
-   ============================================================ */
-
+/* Ngatur bentuk dan warna komponen container */
 .container {
   width: 100%;
   max-width: var(--max-width);
@@ -678,34 +362,27 @@ p, span, li, label, input, textarea, select, button {
   padding-right: var(--section-padding-x);
 }
 
-.container-content {
-  width: 100%;
-  max-width: var(--max-width-content);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--section-padding-x);
-  padding-right: var(--section-padding-x);
-}
-
+/* Ngatur jarak dan judul dari setiap bagian/blok di halaman web */
 .section {
   padding-top: var(--section-padding-y);
   padding-bottom: var(--section-padding-y);
 }
 
-/* Section header pattern */
+/* Ngatur jarak dan judul dari setiap bagian/blok di halaman web */
 .section-label {
-  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-primary);
-  letter-spacing: var(--tracking-wider);
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--color-primary);
   margin-bottom: var(--space-4);
 }
 
+/* Ngatur jarak dan judul dari setiap bagian/blok di halaman web */
 .section-label::before {
   content: '';
   display: inline-block;
@@ -715,6 +392,7 @@ p, span, li, label, input, textarea, select, button {
   border-radius: 2px;
 }
 
+/* Ngatur jarak dan judul dari setiap bagian/blok di halaman web */
 .section-title {
   font-family: var(--font-heading);
   font-size: var(--text-4xl);
@@ -725,6 +403,7 @@ p, span, li, label, input, textarea, select, button {
   margin-bottom: var(--space-4);
 }
 
+/* Ngatur jarak dan judul dari setiap bagian/blok di halaman web */
 .section-subtitle {
   font-family: var(--font-body);
   font-size: var(--text-lg);
@@ -733,13 +412,7 @@ p, span, li, label, input, textarea, select, button {
   max-width: 560px;
 }
 
-
-/* ============================================================
-   DIVIDER & ORNAMENT UTILITIES
-   Wave, mountain, and decorative dividers
-   ============================================================ */
-
-/* Standard section divider */
+/* Ngatur bentuk dan warna komponen divider */
 .divider {
   width: 100%;
   height: 1px;
@@ -753,197 +426,52 @@ p, span, li, label, input, textarea, select, button {
   margin: var(--space-10) 0;
 }
 
-/* Gold accent divider — for headings */
+/* Ngatur bentuk dan warna komponen divider-accent */
 .divider-accent {
   display: block;
-  width: 48px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
-  border-radius: 3px;
-  margin-bottom: var(--space-6);
+  width: 60px;
+  height: 4px;
+  background: var(--color-accent);
+  border-radius: var(--radius-pill);
+  margin: var(--space-2) 0 var(--space-4);
 }
 
-/* Centered accent divider */
-.divider-accent-center {
-  display: block;
-  width: 48px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
-  border-radius: 3px;
-  margin: 0 auto var(--space-6);
-}
-
-/* Green thin divider */
-.divider-green {
-  display: block;
-  width: 32px;
-  height: 2px;
-  background: var(--color-primary);
-  border-radius: 2px;
-}
-
-/* Ornament: leaf deco wrapper (positioned relative to parent) */
-.ornament-leaf {
-  position: absolute;
-  pointer-events: none;
-  user-select: none;
-  z-index: var(--z-base);
-}
-
-.ornament-leaf img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Mountain background divider between sections */
-.section-mountain-divider {
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  line-height: 0;
-  pointer-events: none;
-}
-
-.section-mountain-divider img {
-  width: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-/* Fog overlay utility — layered on top of any section */
-.fog-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.fog-overlay img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  mix-blend-mode: screen;
-  opacity: 0.35;
-}
-
-/* Green gradient bottom fog — for hero sections */
-.fog-gradient-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to top, var(--color-bg) 0%, transparent 100%);
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Nature texture overlay */
-.texture-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.04;
-  background-image: url('/src/assets/asset_bandung/ornamen/TEXTURE BACKGROUND.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-/* Mountain background decoration */
-.mountain-bg {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.08;
-}
-
-.mountain-bg img {
-  width: 100%;
-  object-fit: cover;
-}
-
-
-/* ============================================================
-   CARD UTILITIES
-   ============================================================ */
-
-/* Standard content card */
+/* Ngatur kotak-kotak (card) putih biar punya bayangan 3D */
 .card {
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
   border: 1px solid var(--color-sage-dark);
   overflow: hidden;
-  transition:
-    transform var(--dur-base) var(--ease-spring),
+  transition: transform var(--dur-base) var(--ease-spring),
     box-shadow var(--dur-base) var(--ease-smooth);
 }
 
+/* Ngatur kotak-kotak (card) putih biar punya bayangan 3D */
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-card-hover);
 }
 
-/* Stat/info card */
-.stat-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-sage);
-  text-align: center;
-  transition:
-    transform var(--dur-base) var(--ease-spring),
-    box-shadow var(--dur-base) var(--ease-smooth);
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-icon-wrap.tmb {
+  background: var(--color-tmb-light);
+  color: var(--color-tmb);
 }
 
-.stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-icon-wrap.bandros {
+  background: var(--color-bandros-light);
+  color: var(--color-bandros);
 }
 
-.stat-number {
-  font-family: var(--font-heading);
-  font-size: var(--text-4xl);
-  font-weight: 800;
-  color: var(--color-primary);
-  line-height: 1;
-  letter-spacing: var(--tracking-tight);
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-icon-wrap.angkot {
+  background: var(--color-angkot-light);
+  color: #8B6914;
 }
 
-.stat-label {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin-top: var(--space-2);
-  font-weight: 500;
-}
-
-/* Transport icon badge */
-.transport-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.transport-icon-wrap.tmb    { background: var(--color-tmb-light); color: var(--color-tmb); }
-.transport-icon-wrap.bandros{ background: var(--color-bandros-light); color: var(--color-bandros); }
-.transport-icon-wrap.angkot { background: var(--color-angkot-light); color: #8B6914; }
-
-
-/* ============================================================
-   FORM ELEMENTS
-   ============================================================ */
-
+/* Ngatur bentuk dan warna komponen input */
 .input {
   width: 100%;
   padding: 12px var(--space-4);
@@ -954,244 +482,85 @@ p, span, li, label, input, textarea, select, button {
   font-size: var(--text-base);
   color: var(--color-text);
   outline: none;
-  transition:
-    border-color var(--dur-fast) var(--ease-smooth),
+  transition: border-color var(--dur-fast) var(--ease-smooth),
     box-shadow var(--dur-fast) var(--ease-smooth);
 }
 
+/* Ngatur bentuk dan warna komponen input */
 .input::placeholder {
   color: var(--color-text-light);
 }
 
+/* Ngatur bentuk dan warna komponen input */
 .input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(47, 107, 82, 0.10);
 }
 
-/* Toggle switch — green theme */
-.toggle-wrap {
-  width: 44px;
-  height: 24px;
-  border-radius: var(--radius-pill);
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-smooth);
-  flex-shrink: 0;
+/* Ngatur bentuk dan warna komponen toggle-wrap */
+.toggle-wrap.on {
+  background: var(--color-primary);
 }
 
-.toggle-wrap.on  { background: var(--color-primary); }
-.toggle-wrap.off { background: var(--color-sage-dark); }
-
-.toggle-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  position: absolute;
-  top: 3px;
-  transition: left var(--dur-fast) var(--ease-spring);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+/* Ngatur bentuk dan warna komponen toggle-wrap */
+.toggle-wrap.off {
+  background: var(--color-sage-dark);
 }
 
-.toggle-wrap.on  .toggle-thumb { left: 23px; }
-.toggle-wrap.off .toggle-thumb { left: 3px; }
-
-
-/* ============================================================
-   ANIMATION KEYFRAMES — Foundation Layer
-   ============================================================ */
-
-/* --- Fade animations --- */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* Ngatur bentuk dan warna komponen toggle-wrap */
+.toggle-wrap.on  .toggle-thumb {
+  left: 23px;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(32px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Ngatur bentuk dan warna komponen toggle-wrap */
+.toggle-wrap.off .toggle-thumb {
+  left: 3px;
 }
 
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Ngatur animasi pergerakan (kayak efek muncul dari bawah, dll) */
+.animate-fade-up {
+  animation: fadeInUp  var(--dur-slower) var(--ease-spring) forwards;
 }
 
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-32px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Ngatur animasi pergerakan (kayak efek muncul dari bawah, dll) */
+.animate-fade-down {
+  animation: fadeInDown var(--dur-slower) var(--ease-spring) forwards;
 }
 
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(32px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Ngatur animasi pergerakan (kayak efek muncul dari bawah, dll) */
+.animate-fade-left {
+  animation: fadeInLeft var(--dur-slower) var(--ease-spring) forwards;
 }
 
-/* --- Scale animations --- */
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* Ngatur animasi pergerakan (kayak efek muncul dari bawah, dll) */
+.animate-fade-right {
+  animation: fadeInRight var(--dur-slower) var(--ease-spring) forwards;
 }
 
-@keyframes scaleUp {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
+/* Ngatur animasi pergerakan (kayak efek muncul dari bawah, dll) */
+.animate-scale-in {
+  animation: scaleIn   var(--dur-slow) var(--ease-spring) forwards;
 }
 
-/* --- Floating effects --- */
-@keyframes float {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+/* Ngatur bentuk dan warna komponen delay-100 */
+.delay-100 {
+  animation-delay: 100ms;
 }
 
-@keyframes floatSlow {
-  0%   { transform: translateY(0px) rotate(0deg); }
-  33%  { transform: translateY(-8px) rotate(1deg); }
-  66%  { transform: translateY(-4px) rotate(-0.5deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+/* Ngatur bentuk dan warna komponen delay-200 */
+.delay-200 {
+  animation-delay: 200ms;
 }
 
-@keyframes floatCard {
-  0%   { transform: translateY(0px) rotate(0deg); }
-  50%  { transform: translateY(-6px) rotate(0.5deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+/* Ngatur bentuk dan warna komponen delay-300 */
+.delay-300 {
+  animation-delay: 300ms;
 }
 
-/* --- Leaf drift --- */
-@keyframes leafDrift {
-  0%   { transform: translateY(0px) rotate(0deg) scale(1); }
-  25%  { transform: translateY(-12px) rotate(3deg) scale(1.02); }
-  50%  { transform: translateY(-6px) rotate(-1deg) scale(0.99); }
-  75%  { transform: translateY(-14px) rotate(2deg) scale(1.01); }
-  100% { transform: translateY(0px) rotate(0deg) scale(1); }
-}
-
-/* --- Fog drift --- */
-@keyframes fogDrift {
-  0%   { transform: translateX(0) scale(1); opacity: 0.35; }
-  50%  { transform: translateX(-2%) scale(1.02); opacity: 0.25; }
-  100% { transform: translateX(0) scale(1); opacity: 0.35; }
-}
-
-/* --- Loading bar --- */
-@keyframes loadingBar {
-  0%   { width: 0%; }
-  20%  { width: 25%; }
-  50%  { width: 55%; }
-  80%  { width: 80%; }
-  100% { width: 100%; }
-}
-
-/* --- Loading progress shimmer --- */
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* --- Counter pulse --- */
-@keyframes counterPulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.04); }
-  100% { transform: scale(1); }
-}
-
-/* --- Marker pulse (for active map markers) --- */
-@keyframes markerPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(47, 107, 82, 0.5); }
-  70%  { box-shadow: 0 0 0 12px rgba(47, 107, 82, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(47, 107, 82, 0); }
-}
-
-/* --- Soft bounce (for CTA buttons) --- */
-@keyframes softBounce {
-  0%, 100% { transform: translateY(0); }
-  40%       { transform: translateY(-6px); }
-  60%       { transform: translateY(-3px); }
-}
-
-/* --- Spin (for loading indicators) --- */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* --- Progress loading --- */
-@keyframes progressFill {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-
-
-/* ============================================================
-   ANIMATION UTILITY CLASSES
-   ============================================================ */
-
-/* Static — for elements that need animation on load */
-.animate-fade-in     { animation: fadeIn    var(--dur-slow) var(--ease-smooth) forwards; }
-.animate-fade-up     { animation: fadeInUp  var(--dur-slower) var(--ease-spring) forwards; }
-.animate-fade-down   { animation: fadeInDown var(--dur-slower) var(--ease-spring) forwards; }
-.animate-fade-left   { animation: fadeInLeft var(--dur-slower) var(--ease-spring) forwards; }
-.animate-fade-right  { animation: fadeInRight var(--dur-slower) var(--ease-spring) forwards; }
-.animate-scale-in    { animation: scaleIn   var(--dur-slow) var(--ease-spring) forwards; }
-.animate-float       { animation: float     6s ease-in-out infinite; }
-.animate-float-slow  { animation: floatSlow 8s ease-in-out infinite; }
-.animate-float-card  { animation: floatCard 5s ease-in-out infinite; }
-.animate-leaf        { animation: leafDrift 7s ease-in-out infinite; }
-.animate-fog         { animation: fogDrift  12s ease-in-out infinite; }
-.animate-spin        { animation: spin      1s linear infinite; }
-
-/* Staggered animation delays */
-.delay-100  { animation-delay: 100ms; }
-.delay-200  { animation-delay: 200ms; }
-.delay-300  { animation-delay: 300ms; }
-.delay-400  { animation-delay: 400ms; }
-.delay-500  { animation-delay: 500ms; }
-.delay-600  { animation-delay: 600ms; }
-.delay-700  { animation-delay: 700ms; }
-.delay-800  { animation-delay: 800ms; }
-.delay-900  { animation-delay: 900ms; }
-.delay-1000 { animation-delay: 1000ms; }
-.delay-1200 { animation-delay: 1200ms; }
-.delay-1500 { animation-delay: 1500ms; }
-.delay-2000 { animation-delay: 2000ms; }
-
-/* Initial hidden state for scroll-triggered animations */
 [data-animate] {
   opacity: 0;
   transform: translateY(24px);
-  transition:
-    opacity var(--dur-slower) var(--ease-spring),
+  transition: opacity var(--dur-slower) var(--ease-spring),
     transform var(--dur-slower) var(--ease-spring);
 }
 
@@ -1215,26 +584,49 @@ p, span, li, label, input, textarea, select, button {
   transform: translateY(0) translateX(0) scale(1);
 }
 
-/* Stagger children inside [data-animate-group] */
 [data-animate-group] > * {
   opacity: 0;
   transform: translateY(20px);
-  transition:
-    opacity var(--dur-slow) var(--ease-spring),
+  transition: opacity var(--dur-slow) var(--ease-spring),
     transform var(--dur-slow) var(--ease-spring);
 }
 
-[data-animate-group].is-visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0ms; }
-[data-animate-group].is-visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 100ms; }
-[data-animate-group].is-visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 200ms; }
-[data-animate-group].is-visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 300ms; }
-[data-animate-group].is-visible > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 400ms; }
-[data-animate-group].is-visible > *:nth-child(6) { opacity: 1; transform: none; transition-delay: 500ms; }
+[data-animate-group].is-visible > *:nth-child(1) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0ms;
+}
 
+[data-animate-group].is-visible > *:nth-child(2) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 100ms;
+}
 
-/* ============================================================
-   SCROLLBAR STYLING — Subtle, on-brand
-   ============================================================ */
+[data-animate-group].is-visible > *:nth-child(3) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 200ms;
+}
+
+[data-animate-group].is-visible > *:nth-child(4) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 300ms;
+}
+
+[data-animate-group].is-visible > *:nth-child(5) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 400ms;
+}
+
+[data-animate-group].is-visible > *:nth-child(6) {
+  opacity: 1;
+  transform: none;
+  transition-delay: 500ms;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -1253,41 +645,29 @@ p, span, li, label, input, textarea, select, button {
   background: var(--color-primary-light);
 }
 
-
-/* ============================================================
-   LEAFLET MAP — BASE OVERRIDES
-   Migrated to light/nature theme. Detailed popup styling
-   will be finalized in Sprint 6.
-   ============================================================ */
-
-/* Map container base */
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-container {
   background: #E8F0E5 !important;
   font-family: var(--font-body) !important;
 }
 
-/* Remove Leaflet default popup chrome */
-.leaflet-popup-content-wrapper {
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-}
-
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-popup-tip-container {
   display: none !important;
 }
 
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-popup-content {
   margin: 0 !important;
   line-height: 1 !important;
 }
 
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-popup-close-button {
   display: none !important;
 }
 
-/* Leaflet zoom control — override to match theme */
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-control-zoom {
   border: none !important;
   box-shadow: var(--shadow-card) !important;
@@ -1295,6 +675,7 @@ p, span, li, label, input, textarea, select, button {
   overflow: hidden;
 }
 
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-control-zoom a {
   background: var(--color-surface) !important;
   color: var(--color-text) !important;
@@ -1304,12 +685,13 @@ p, span, li, label, input, textarea, select, button {
   transition: background var(--dur-fast) var(--ease-smooth) !important;
 }
 
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-control-zoom a:hover {
   background: var(--color-sage) !important;
   color: var(--color-primary) !important;
 }
 
-/* Attribution */
+/* Ngatur tampilan bawaan dari sistem Peta Leaflet (sistem petanya) */
 .leaflet-control-attribution {
   background: rgba(255,255,255,0.75) !important;
   font-family: var(--font-body) !important;
@@ -1318,7 +700,7 @@ p, span, li, label, input, textarea, select, button {
   backdrop-filter: var(--glass-blur-light) !important;
 }
 
-/* Base popup card — will be extended in Sprint 6 */
+/* Ngatur bentuk dan warna komponen smart-hud-popup */
 .smart-hud-popup {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
@@ -1332,7 +714,7 @@ p, span, li, label, input, textarea, select, button {
   font-family: var(--font-body);
 }
 
-/* Halte markers — light theme, no neon */
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-halte {
   border-radius: 50%;
   background: var(--color-surface);
@@ -1344,32 +726,37 @@ p, span, li, label, input, textarea, select, button {
   transition: all var(--dur-fast) var(--ease-smooth);
 }
 
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-halte.brt {
   border-color: var(--color-tmb);
   background: var(--color-tmb-light);
 }
 
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-halte.bus {
   border-color: var(--color-bandros);
   background: var(--color-bandros-light);
 }
 
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-halte.angkot {
   border-color: var(--color-angkot);
   background: var(--color-angkot-light);
 }
 
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-halte.active {
   animation: markerPulse 1.5s ease-out infinite;
   transform: scale(1.2);
 }
 
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-halte.dimmed {
   opacity: 0.25;
   box-shadow: none;
 }
 
-/* Wisata polygon markers */
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-wisata {
   background: var(--color-surface);
   border: 2px solid var(--color-wisata);
@@ -1379,52 +766,12 @@ p, span, li, label, input, textarea, select, button {
   transition: all var(--dur-fast) var(--ease-spring);
 }
 
+/* Ngatur bentuk pin (titik lokasi) yang ada di dalem peta */
 .marker-wisata:hover {
   transform: scale(1.1) translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-/* Map panel utility (sidebar/filter panels) */
-.map-panel {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-sage);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Route item hover */
-.route-item-modern {
-  transition: background var(--dur-fast) var(--ease-smooth);
-  border-radius: var(--radius-sm);
-}
-
-.route-item-modern:hover {
-  background: var(--color-sage) !important;
-}
-
-/* HUD stat bar (top of map) */
-.hud-stat {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
-
-.hud-stat strong {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  color: var(--color-primary);
-  font-size: var(--text-base);
-}
-
-
-/* ============================================================
-   SELECTION & FOCUS STYLES
-   ============================================================ */
 ::selection {
   background: rgba(47, 107, 82, 0.18);
   color: var(--color-primary);
@@ -1436,58 +783,9 @@ p, span, li, label, input, textarea, select, button {
   border-radius: var(--radius-xs);
 }
 
-
-/* ============================================================
-   RESPONSIVE UTILITIES
-   ============================================================ */
-@media (max-width: 1024px) {
-  :root {
-    --section-padding-x: clamp(16px, 4vw, 48px);
-  }
-}
-
-@media (max-width: 768px) {
-  :root {
-    --section-padding-x: 20px;
-    --section-padding-y: clamp(48px, 8vw, 72px);
-  }
-
-  .section-title {
-    font-size: var(--text-3xl);
-  }
-
-  .smart-hud-popup {
-    width: 260px;
-  }
-
-  [data-animate],
-  [data-animate="left"],
-  [data-animate="right"],
-  [data-animate="scale"] {
-    /* Reduce motion on small screens for performance */
-    transition-duration: var(--dur-slow);
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --section-padding-x: 16px;
-  }
-
-  .btn-primary,
-  .btn-secondary,
-  .btn-inverse {
-    padding: 12px 24px;
-    font-size: var(--text-sm);
-  }
-}
-
-
-/* ============================================================
-   SPRINT 2 — NAVBAR STYLES
-   Floating glass pill, scroll-aware, sticky
-   ============================================================ */
-
+/* === BAGIAN 5: MENU ATAS (NAVBAR) ===
+Bilah menu navigasi yang nempel di atas */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper {
   position: fixed;
   top: 20px;
@@ -1500,6 +798,7 @@ p, span, li, label, input, textarea, select, button {
   pointer-events: none;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar {
   pointer-events: auto;
   display: flex;
@@ -1510,28 +809,24 @@ p, span, li, label, input, textarea, select, button {
   height: 64px;
   padding: 0 8px 0 16px;
   border-radius: var(--radius-pill);
-
-  /* Default: transparent (on hero photo) */
   background: rgba(24, 57, 43, 0.50);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: var(--shadow-lg);
-
-  transition:
-    background var(--dur-base) var(--ease-smooth),
+  transition: background var(--dur-base) var(--ease-smooth),
     border-color var(--dur-base) var(--ease-smooth),
     box-shadow var(--dur-base) var(--ease-smooth);
 }
 
-/* Scrolled state — warm white glass */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-navbar {
   background: var(--glass-bg);
   border-color: var(--glass-border-sage);
   box-shadow: var(--shadow-card);
 }
 
-/* Mobile menu wrapper */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-mobile {
   pointer-events: auto;
   width: calc(100% - 48px);
@@ -1548,7 +843,7 @@ p, span, li, label, input, textarea, select, button {
   overflow: hidden;
 }
 
-/* ── Logo ── */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-logo {
   display: flex;
   align-items: center;
@@ -1562,14 +857,17 @@ p, span, li, label, input, textarea, select, button {
   flex-shrink: 0;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-logo:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-logo:hover {
   background: var(--color-sage);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-logo-icon {
   width: 36px;
   height: 36px;
@@ -1582,16 +880,19 @@ p, span, li, label, input, textarea, select, button {
   flex-shrink: 0;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-logo-icon {
   background: var(--color-primary);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-logo-text {
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-logo-name {
   font-family: var(--font-heading);
   font-size: var(--text-base);
@@ -1601,29 +902,24 @@ p, span, li, label, input, textarea, select, button {
   white-space: nowrap;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-logo-name {
   color: var(--color-text-strong);
 }
 
-.kh-nav-logo-sub {
-  font-family: var(--font-body);
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.60);
-  white-space: nowrap;
-  line-height: 1;
-}
-
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-logo-sub {
   color: var(--color-text-muted);
 }
 
-/* ── Desktop links ── */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-links {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-link {
   position: relative;
   background: none;
@@ -1635,8 +931,7 @@ p, span, li, label, input, textarea, select, button {
   color: rgba(255, 255, 255, 0.80);
   cursor: pointer;
   border-radius: var(--radius-md);
-  transition:
-    color var(--dur-fast) var(--ease-smooth),
+  transition: color var(--dur-fast) var(--ease-smooth),
     background var(--dur-fast) var(--ease-smooth);
   display: flex;
   flex-direction: column;
@@ -1645,47 +940,54 @@ p, span, li, label, input, textarea, select, button {
   white-space: nowrap;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-link {
   color: var(--color-text-muted);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-link:hover {
   color: white;
   background: rgba(255, 255, 255, 0.10);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-link:hover {
   color: var(--color-primary);
   background: var(--color-sage);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-link--active {
   color: white !important;
   font-weight: 600;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-link--active {
   color: var(--color-primary) !important;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-link-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
+  width: 70%;
+  height: 3px;
+  border-radius: 2px;
   background: var(--color-accent);
   position: absolute;
-  bottom: 4px;
+  bottom: 0px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* ── Actions ── */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-cta {
   display: inline-flex;
   align-items: center;
@@ -1700,24 +1002,25 @@ p, span, li, label, input, textarea, select, button {
   border-radius: var(--radius-pill);
   cursor: pointer;
   box-shadow: var(--shadow-btn);
-  transition:
-    background var(--dur-fast) var(--ease-smooth),
+  transition: background var(--dur-fast) var(--ease-smooth),
     transform var(--dur-fast) var(--ease-spring),
     box-shadow var(--dur-fast) var(--ease-smooth);
   white-space: nowrap;
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-cta:hover {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-btn-hover);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-hamburger {
   display: none;
 }
 
-/* Mobile menu links */
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-mobile-link {
   background: none;
   border: none;
@@ -1732,64 +1035,18 @@ p, span, li, label, input, textarea, select, button {
   transition: background var(--dur-fast) var(--ease-smooth), color var(--dur-fast);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-mobile-link:hover {
   background: var(--color-sage);
   color: var(--color-primary);
 }
 
+/* Ngatur bagian navigasi menu atas (warna, ukuran, posisi nempel) */
 .kh-nav-mobile-cta {
   padding: var(--space-4) var(--space-5) var(--space-5);
 }
 
-/* Responsive navbar */
-@media (max-width: 900px) {
-  .kh-nav-links {
-    display: none;
-  }
-
-  .kh-nav-hamburger {
-    display: flex;
-    color: white;
-    background: rgba(255, 255, 255, 0.10);
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-
-  .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-hamburger {
-    color: var(--color-text);
-    background: var(--color-sage);
-    border-color: var(--color-sage-dark);
-  }
-}
-
-@media (max-width: 560px) {
-  .kh-navbar-wrapper {
-    top: 12px;
-  }
-
-  .kh-navbar {
-    width: calc(100% - 24px);
-    height: 58px;
-  }
-
-  .kh-nav-mobile {
-    width: calc(100% - 24px);
-  }
-
-  .kh-nav-logo-sub {
-    display: none;
-  }
-
-  .kh-nav-cta {
-    padding: 8px 14px;
-    font-size: var(--text-xs);
-  }
-}
-
-
-/* ============================================================
-   SPRINT 2 — HOME PAGE STYLES
-   ============================================================ */
-
+/* Ngatur bentuk dan warna komponen home-page */
 .home-page {
   width: 100%;
   min-height: 100vh;
@@ -1797,7 +1054,9 @@ p, span, li, label, input, textarea, select, button {
   overflow-x: hidden;
 }
 
-/* ── HERO SECTION ── */
+/* === BAGIAN 6: HALAMAN DEPAN (HERO) ===
+Tampilan layar paling atas pas web baru dibuka */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-section {
   position: relative;
   width: 100%;
@@ -1808,177 +1067,115 @@ p, span, li, label, input, textarea, select, button {
   padding-top: 100px;
 }
 
-/* Background layer stack */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-bg-layers {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-bg-photo {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 30%;
+  object-position: center 35%;
+  animation: slowZoom 20s ease-out forwards;
 }
 
-.hero-bg-mountain {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 55%;
-  object-fit: cover;
-  object-position: bottom center;
-  opacity: 0.25;
-  mix-blend-mode: multiply;
-}
-
-.hero-bg-fog {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  mix-blend-mode: screen;
-  opacity: 0.20;
-}
-
-/* Left gradient — dark for text readability */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-gradient-left {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    100deg,
-    rgba(24, 57, 43, 0.82) 0%,
-    rgba(24, 57, 43, 0.65) 45%,
-    rgba(24, 57, 43, 0.20) 70%,
+    105deg,
+    rgba(10, 25, 16, 0.80) 0%,
+    rgba(10, 25, 16, 0.55) 38%,
+    rgba(10, 25, 16, 0.18) 60%,
     transparent 100%
   );
 }
 
-/* Bottom gradient — blends into cream page background */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-gradient-bottom {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 35%;
-  background: linear-gradient(to top, var(--color-bg) 0%, transparent 100%);
+  background: linear-gradient(to top, #eef3eb 0%, transparent 100%);
   z-index: 1;
 }
 
-/* Leaf ornaments */
-.hero-leaf {
-  position: absolute;
-  z-index: 2;
-  pointer-events: none;
-  width: 200px;
-  height: auto;
-  opacity: 0.75;
-}
-
-.hero-leaf--tl {
-  top: 80px;
-  right: 0;
-  width: 220px;
-  transform: scaleX(-1);
-}
-
-.hero-leaf--br {
-  bottom: 100px;
-  left: 0;
-  width: 180px;
-  transform: rotate(15deg);
-}
-
-/* Main content container */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-container {
   position: relative;
   z-index: 5;
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 var(--section-padding-x) 120px;
+  padding: 0 var(--section-padding-x) 140px;
   display: grid;
-  grid-template-columns: 1fr 480px;
-  gap: var(--space-12);
+  grid-template-columns: 1fr 380px;
+  gap: 40px;
   align-items: center;
 }
 
-/* LEFT column */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-left {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-/* Smart city badge */
-.hero-smart-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: rgba(216, 177, 92, 0.15);
-  color: var(--color-accent);
-  border: 1px solid rgba(216, 177, 92, 0.35);
-  border-radius: var(--radius-pill);
-  padding: 6px 14px;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  margin-bottom: var(--space-5);
-  width: fit-content;
-  backdrop-filter: blur(8px);
-}
-
-.hero-badge-dot {
-  font-size: 10px;
-  color: var(--color-secondary);
-}
-
-/* Main heading */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-heading {
   font-family: var(--font-heading);
+  letter-spacing: -0.03em;
+  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
   font-size: var(--text-hero);
   font-weight: 800;
-  color: white;
   line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-  margin-bottom: var(--space-2);
+  color: var(--color-surface);
+  margin-bottom: var(--space-4);
 }
 
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-heading-accent {
+  color: #6ee7b7;
   display: block;
-  color: var(--color-accent);
+  background: linear-gradient(135deg, #4ade80, #3FAF7B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Subtitle */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-subtitle {
   font-family: var(--font-body);
-  font-size: var(--text-lg);
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-  margin-bottom: var(--space-4);
   letter-spacing: var(--tracking-wide);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-surface);
+  margin-bottom: var(--space-6);
 }
 
-/* Description */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-desc {
   font-family: var(--font-body);
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   font-size: var(--text-base);
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--color-text-inverse);
   line-height: var(--leading-relaxed);
-  max-width: 480px;
+  max-width: 500px;
   margin-bottom: var(--space-8);
+  opacity: 0.9;
 }
 
-/* Hero CTA */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-cta {
   width: fit-content;
   padding: 15px 32px;
@@ -1986,253 +1183,16 @@ p, span, li, label, input, textarea, select, button {
   box-shadow: 0 4px 20px rgba(47, 107, 82, 0.40);
 }
 
-/* RIGHT column */
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
 .hero-right {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-/* Mini map card */
-.hero-map-card {
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  border: 1px solid var(--glass-border);
-}
-
-.hero-map-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-sage);
-}
-
-.hero-map-status {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-text-strong);
-}
-
-.hero-map-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-primary);
-}
-
-.hero-map-live {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-secondary);
-  letter-spacing: var(--tracking-wide);
-}
-
-.hero-map-viewport {
-  position: relative;
-  height: 200px;
-}
-
-/* Clickable overlay */
-.hero-map-overlay {
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: var(--space-3);
-  transition: background var(--dur-fast) var(--ease-smooth);
-  z-index: 400;
-}
-
-.hero-map-overlay:hover {
-  background: rgba(24, 57, 43, 0.12);
-}
-
-.hero-map-overlay-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--color-primary);
-  color: white;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-sm);
-  letter-spacing: var(--tracking-wide);
-}
-
-/* Stats card */
-.hero-stats-card {
-  border-radius: var(--radius-xl);
-  padding: var(--space-4) var(--space-5);
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.hero-stat-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 10px 0;
-}
-
-.hero-stat-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.hero-stat-info {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  flex: 1;
-}
-
-.hero-stat-value {
-  font-family: var(--font-heading);
-  font-size: var(--text-2xl);
-  font-weight: 800;
-  color: var(--color-text-strong);
-  line-height: 1;
-}
-
-.hero-stat-label {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.hero-stat-divider {
-  height: 1px;
-  background: var(--color-sage);
-  margin: 0 -4px;
-}
-
-/* Mountain wave divider */
-.hero-mountain-divider {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 3;
-  line-height: 0;
-}
-
-.hero-mountain-divider img {
-  width: 100%;
-  display: block;
-  object-fit: cover;
-  height: 80px;
-  object-position: top;
-}
-
-
-/* ── SECTION: OVERVIEW ── */
-.overview-section {
-  background: var(--color-bg);
-  padding: var(--section-padding-y) var(--section-padding-x);
-}
-
-.overview-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-}
-
-.section-header-center {
-  text-align: center;
-  margin-bottom: var(--space-12);
-}
-
-.overview-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-5);
-  margin-top: var(--space-10);
-}
-
-.overview-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-sage);
-  border-radius: var(--radius-xl);
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    transform var(--dur-base) var(--ease-spring),
-    box-shadow var(--dur-base) var(--ease-smooth),
-    border-color var(--dur-base) var(--ease-smooth);
-  box-shadow: var(--shadow-card);
-}
-
-.overview-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--color-primary);
-}
-
-.overview-card-icon {
-  width: 52px;
-  height: 52px;
-  background: var(--color-tmb-light);
-  border: 1px solid var(--color-tmb-border);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-primary);
-}
-
-.overview-card-title {
-  font-family: var(--font-heading);
-  font-size: var(--text-xl);
-  font-weight: 700;
-  color: var(--color-text-strong);
-}
-
-.overview-card-desc {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  line-height: var(--leading-relaxed);
-  flex: 1;
-}
-
-.overview-card-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-top: auto;
-}
-
-
-/* ── SECTION: TRANSPORT ── */
+/* === BAGIAN 8: KARTU ANGKUTAN UMUM ===
+Desain kotak buat nampilin daftar angkot, bus, dll */
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-section {
   position: relative;
   background: var(--color-bg-sage);
@@ -2240,6 +1200,7 @@ p, span, li, label, input, textarea, select, button {
   overflow: hidden;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-texture {
   position: absolute;
   inset: 0;
@@ -2247,12 +1208,14 @@ p, span, li, label, input, textarea, select, button {
   pointer-events: none;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-texture img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-mountain {
   position: absolute;
   bottom: 0;
@@ -2262,6 +1225,7 @@ p, span, li, label, input, textarea, select, button {
   pointer-events: none;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-mountain img {
   width: 100%;
   object-fit: cover;
@@ -2269,12 +1233,14 @@ p, span, li, label, input, textarea, select, button {
   object-position: bottom;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-container {
   max-width: var(--max-width);
   margin: 0 auto;
   position: relative;
 }
 
+/* Ngatur jarak dan judul dari setiap bagian/blok di halaman web */
 .section-header-split {
   display: flex;
   align-items: flex-end;
@@ -2284,34 +1250,38 @@ p, span, li, label, input, textarea, select, button {
   flex-wrap: wrap;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-6);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-card {
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-card);
   border: 1px solid var(--color-sage);
-  transition:
-    transform var(--dur-base) var(--ease-spring),
+  transition: transform var(--dur-base) var(--ease-spring),
     box-shadow var(--dur-base) var(--ease-smooth);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-card-hover);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-img-wrap {
   position: relative;
   height: 200px;
   overflow: hidden;
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-img {
   width: 100%;
   height: 100%;
@@ -2319,10 +1289,12 @@ p, span, li, label, input, textarea, select, button {
   transition: transform var(--dur-slower) var(--ease-smooth);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-card:hover .transport-img {
   transform: scale(1.05);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-badge {
   position: absolute;
   top: 12px;
@@ -2335,13 +1307,7 @@ p, span, li, label, input, textarea, select, button {
   border-radius: var(--radius-pill);
 }
 
-.transport-body {
-  padding: var(--space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-name {
   font-family: var(--font-heading);
   font-size: var(--text-xl);
@@ -2350,18 +1316,7 @@ p, span, li, label, input, textarea, select, button {
   line-height: var(--leading-snug);
 }
 
-.transport-desc {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  line-height: var(--leading-relaxed);
-}
-
-.transport-stats {
-  display: flex;
-  gap: var(--space-4);
-}
-
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-stat {
   display: inline-flex;
   align-items: center;
@@ -2372,6 +1327,7 @@ p, span, li, label, input, textarea, select, button {
   color: var(--color-primary);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
 .transport-meta {
   display: flex;
   gap: var(--space-4);
@@ -2379,50 +1335,21 @@ p, span, li, label, input, textarea, select, button {
   border-top: 1px solid var(--color-sage);
 }
 
-.transport-meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
-
-.transport-detail-btn {
-  margin-top: var(--space-2);
-  font-size: var(--text-sm);
-  padding: 10px 20px;
-}
-
-
-/* ── SECTION: WISATA ── */
+/* === BAGIAN 9: KARTU WISATA ===
+Desain kotak buat nampilin rekomendasi wisata terdekat */
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
 .wisata-section {
   background: var(--color-bg);
   padding: var(--section-padding-y) 0 var(--section-padding-y) var(--section-padding-x);
 }
 
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
 .wisata-container {
   max-width: var(--max-width);
   margin: 0 auto;
 }
 
-/* Horizontal carousel */
-.wisata-carousel {
-  display: flex;
-  gap: var(--space-4);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-right: var(--section-padding-x);
-  padding-bottom: var(--space-4);
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-sage-dark) var(--color-bg-alt);
-}
-
-.wisata-carousel::-webkit-scrollbar {
-  height: 5px;
-}
-
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
 .wisata-card {
   flex-shrink: 0;
   width: 220px;
@@ -2433,172 +1360,22 @@ p, span, li, label, input, textarea, select, button {
   box-shadow: var(--shadow-card);
   border: 1px solid var(--color-sage);
   background: var(--color-surface);
-  transition:
-    transform var(--dur-base) var(--ease-spring),
+  transition: transform var(--dur-base) var(--ease-spring),
     box-shadow var(--dur-base) var(--ease-smooth);
 }
 
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
 .wisata-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-card-hover);
 }
 
-.wisata-img-wrap {
-  position: relative;
-  height: 150px;
-  overflow: hidden;
-}
-
-.wisata-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--dur-slower) var(--ease-smooth);
-}
-
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
 .wisata-card:hover .wisata-img {
   transform: scale(1.06);
 }
 
-.wisata-dist-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-}
-
-.wisata-info {
-  padding: var(--space-3) var(--space-4) var(--space-4);
-}
-
-.wisata-name {
-  font-family: var(--font-heading);
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text-strong);
-  margin-bottom: 4px;
-}
-
-.wisata-radius {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
-
-
-/* ── SECTION: STATS DARK ── */
-.stats-dark-section {
-  position: relative;
-  background: var(--color-dark);
-  padding: var(--section-padding-y) var(--section-padding-x);
-  overflow: hidden;
-}
-
-.stats-mountain {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-  opacity: 0.08;
-}
-
-.stats-mountain img {
-  width: 100%;
-  object-fit: cover;
-  height: 200px;
-  object-position: bottom;
-}
-
-.stats-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  position: relative;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-6);
-}
-
-.stats-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--space-2);
-  padding: var(--space-6);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-xl);
-  transition:
-    background var(--dur-base) var(--ease-smooth),
-    transform var(--dur-base) var(--ease-spring);
-}
-
-.stats-item:hover {
-  background: rgba(255, 255, 255, 0.07);
-  transform: translateY(-3px);
-}
-
-.stats-value {
-  font-family: var(--font-heading);
-  font-size: clamp(36px, 4vw, 52px);
-  font-weight: 800;
-  color: var(--color-accent);
-  line-height: 1;
-  letter-spacing: var(--tracking-tight);
-}
-
-.stats-label {
-  font-family: var(--font-heading);
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: white;
-}
-
-.stats-sub {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.45);
-  line-height: var(--leading-relaxed);
-}
-
-
-/* ── SECTION: CTA ── */
-.cta-section {
-  position: relative;
-  background: var(--color-bg-sage);
-  padding: var(--section-padding-y) var(--section-padding-x);
-  overflow: hidden;
-  text-align: center;
-}
-
-.cta-leaf {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.cta-leaf img {
-  width: 100%;
-  transform: scaleX(-1);
-}
-
-.cta-container {
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-
-/* ── FOOTER ── */
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-section {
   position: relative;
   background: var(--color-dark);
@@ -2606,24 +1383,27 @@ p, span, li, label, input, textarea, select, button {
   overflow: hidden;
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-mountain {
   position: absolute;
-  top: -2px;
+  bottom: 0;
   left: 0;
   right: 0;
   line-height: 0;
   pointer-events: none;
-  transform: rotate(180deg);
   opacity: 0.12;
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-mountain img {
   width: 100%;
   display: block;
   object-fit: cover;
-  height: 80px;
+  object-position: bottom;
+  height: 120px;
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-container {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -2633,6 +1413,7 @@ p, span, li, label, input, textarea, select, button {
   gap: var(--space-10);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-logo {
   display: flex;
   align-items: center;
@@ -2644,6 +1425,7 @@ p, span, li, label, input, textarea, select, button {
   margin-bottom: var(--space-4);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-brand-desc {
   font-family: var(--font-body);
   font-size: var(--text-sm);
@@ -2653,11 +1435,13 @@ p, span, li, label, input, textarea, select, button {
   margin-bottom: var(--space-5);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-social {
   display: flex;
   gap: var(--space-2);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-social-link {
   width: 36px;
   height: 36px;
@@ -2675,12 +1459,14 @@ p, span, li, label, input, textarea, select, button {
   transition: all var(--dur-fast) var(--ease-smooth);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-social-link:hover {
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: white;
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-col-title {
   font-family: var(--font-heading);
   font-size: var(--text-sm);
@@ -2691,6 +1477,7 @@ p, span, li, label, input, textarea, select, button {
   margin-bottom: var(--space-5);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-links {
   list-style: none;
   display: flex;
@@ -2699,6 +1486,7 @@ p, span, li, label, input, textarea, select, button {
 }
 
 .footer-links li,
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-links a {
   font-family: var(--font-body);
   font-size: var(--text-sm);
@@ -2708,16 +1496,19 @@ p, span, li, label, input, textarea, select, button {
   cursor: pointer;
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-links a:hover {
   color: var(--color-accent);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-team span {
   color: rgba(255, 255, 255, 0.30);
   font-size: var(--text-xs);
   margin-left: 4px;
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-institute {
   font-family: var(--font-body);
   font-size: 11px;
@@ -2728,6 +1519,7 @@ p, span, li, label, input, textarea, select, button {
   padding-top: var(--space-4);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding: var(--space-5) var(--section-padding-x);
@@ -2738,116 +1530,903 @@ p, span, li, label, input, textarea, select, button {
   gap: var(--space-2);
 }
 
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
 .footer-bottom p {
   font-family: var(--font-body);
   font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.30);
 }
 
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium {
+  position: relative;
+  height: 380px;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base);
+  background: var(--color-dark);
+}
 
-/* ── HOME: RESPONSIVE ── */
-@media (max-width: 1100px) {
-  .hero-container {
-    grid-template-columns: 1fr 400px;
-    gap: var(--space-8);
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium .transport-img-wrap {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium .transport-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-smooth);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium:hover .transport-img {
+  transform: scale(1.08);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-badge-top {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 6px 14px;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+}
+
+/* Ngatur warna kotak kecil penanda jarak (hijau/kuning/abu) */
+.badge-moda-bandros {
+  background: rgba(216, 177, 92, 0.9);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Ngatur warna kotak kecil penanda jarak (hijau/kuning/abu) */
+.badge-moda-tmb {
+  background: rgba(58, 130, 195, 0.9);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Ngatur warna kotak kecil penanda jarak (hijau/kuning/abu) */
+.badge-moda-angkot {
+  background: rgba(47, 107, 82, 0.9);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-static-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-5);
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-static-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  margin-top: auto;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  transition: opacity var(--dur-base) var(--ease-smooth);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium:hover .transport-static-name {
+  opacity: 0;
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-glass-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-6);
+  background: linear-gradient(to top, rgba(14, 35, 24, 0.95) 0%, rgba(14, 35, 24, 0.75) 60%, transparent 100%);
+  backdrop-filter: blur(4px);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--dur-base) var(--ease-smooth), opacity var(--dur-base), padding var(--dur-base);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium:hover .transport-glass-overlay {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-overlay-desc {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: var(--leading-relaxed);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.transport-overlay-stats,
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-overlay-meta {
+  display: flex;
+  gap: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.transport-overlay-stat,
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-overlay-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-overlay-stat {
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-overlay-meta {
+  padding-top: var(--space-2);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-overlay-cta {
+  margin-top: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 0;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+  width: 100%;
+}
+
+/* Ngatur desain kotak daftar angkutan umum (angkot, bus, halte) */
+.transport-card-premium:hover .transport-overlay-cta {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-grid-scroll {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  padding-bottom: var(--space-4);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large {
+  height: 380px;
+  background: var(--color-dark);
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-smooth);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-img-wrap {
+  inset: 0;
+  height: 100%;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-img {
+  transition: transform var(--dur-slow) var(--ease-smooth);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover .wisata-large-img {
+  transform: scale(1.08);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-gradient {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(24, 57, 43, 0.95) 0%, rgba(47, 107, 82, 0.7) 100%);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-dist-pill {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-family: var(--font-body);
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Ngatur warna kotak kecil penanda jarak (hijau/kuning/abu) */
+.badge-dist-near {
+  background: var(--badge-near-bg, rgba(63, 175, 123, 0.15));
+  color: var(--badge-near-color, #2F6B52);
+  border: 1px solid var(--badge-near-border, rgba(63, 175, 123, 0.40));
+}
+
+/* Ngatur warna kotak kecil penanda jarak (hijau/kuning/abu) */
+.badge-dist-mid {
+  background: var(--badge-mid-bg, rgba(216, 177, 92, 0.15));
+  color: var(--badge-mid-color, #9A7A30);
+  border: 1px solid var(--badge-mid-border, rgba(216, 177, 92, 0.40));
+}
+
+/* Ngatur warna kotak kecil penanda jarak (hijau/kuning/abu) */
+.badge-dist-far {
+  background: var(--badge-far-bg, rgba(107, 127, 115, 0.12));
+  color: var(--badge-far-color, #6B7F73);
+  border: 1px solid var(--badge-far-border, rgba(107, 127, 115, 0.30));
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-static-overlay {
+  pointer-events: none;
+  z-index: 10;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-4);
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-static-name {
+  font-family: var(--font-heading);
+  margin: 0;
+  margin-top: auto;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  transition: opacity var(--dur-base) var(--ease-smooth);
+  color: white;
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover .wisata-static-name {
+  opacity: 0;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-overlay {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 11;
+  color: white;
+  background: linear-gradient(to top, rgba(14, 35, 24, 0.95) 0%, rgba(14, 35, 24, 0.75) 60%, transparent 100%);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-5);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-spring);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover .wisata-large-overlay {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-name {
+  font-family: var(--font-heading);
+  line-height: var(--leading-snug);
+  color: white;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-sub {
+  display: block;
+  font-family: var(--font-body);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
+.footer-tagline {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
+.footer-tim .footer-links {
+  gap: var(--space-4);
+}
+
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
+.footer-team-item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
+.footer-team-name {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Ngatur bagian bawah web (footer) yang ada info kontak dan logo */
+.footer-team-nim {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* === BAGIAN 7: PETA KECIL DI BERANDA ===
+Bagian yang nampilin peta interaktif bohongan */
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-section {
+  background: var(--color-bg);
+  padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0 32px;
+}
+
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-btn {
+  width: fit-content;
+}
+
+/* Ngatur bentuk dan warna komponen map-mockup-root */
+.map-mockup-root {
+  width: 100%;
+  height: 450px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(47, 107, 82, 0.12);
+  border: 1px solid var(--color-sage);
+  background: #e8f0e5;
+  position: relative;
+}
+
+/* Ngatur bentuk dan warna komponen map-marker */
+.map-marker:hover {
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+/* Ngatur bentuk dan warna komponen map-layer-toggle */
+.map-layer-toggle.on {
+  background: var(--color-primary);
+}
+
+/* Ngatur bentuk dan warna komponen map-layer-toggle */
+.map-layer-toggle.off {
+  background: var(--color-sage-dark);
+}
+
+/* Ngatur bagian gambar dan teks utama (Hero) di halaman depan */
+.hero-cta-row {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Ngatur peta interaktif kecil (preview) di halaman beranda */
+.map-preview-mockup {
+  width: 100%;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover .wisata-large-gradient {
+  opacity: 1;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-large-cta {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  width: max-content;
+  transition: background var(--dur-fast), transform var(--dur-fast);
+}
+
+.wisata-large-cta:hover {
+  background: var(--color-primary-hover);
+  transform: scale(1.05);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-glass-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-5);
+  background: var(--glass-bg-dark-soft);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border-dark);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover .wisata-glass-overlay {
+  transform: translateY(0);
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-card-large:hover .wisata-static-overlay {
+  opacity: 0;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-overlay-name {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: white;
+  margin-bottom: 4px;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-overlay-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-overlay-cta {
+  background: white;
+  color: var(--color-primary);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+/* Ngatur desain gambar dan kotak rekomendasi tempat wisata */
+.wisata-overlay-cta:hover {
+  background: var(--color-bg-alt);
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 
-  .overview-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .footer-container {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-8);
+  to {
+    opacity: 1;
   }
 }
 
-@media (max-width: 900px) {
-  .hero-container {
-    grid-template-columns: 1fr;
-    padding-bottom: 80px;
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
   }
 
-  .hero-right {
-    order: -1;
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .hero-map-card { flex: 1; }
-  .hero-stats-card { flex: 0 0 200px; }
-
-  .transport-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (max-width: 700px) {
-  .hero-container {
-    grid-template-columns: 1fr;
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
   }
 
-  .hero-right {
-    flex-direction: column;
-  }
-
-  .hero-stats-card {
-    flex: 1;
-  }
-
-  .hero-stat-row {
-    flex-direction: row;
-  }
-
-  .transport-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .overview-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .footer-container {
-    grid-template-columns: 1fr;
-    gap: var(--space-8);
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .hero-leaf--br { display: none; }
-}
-
-@media (max-width: 480px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .section-header-split {
-    flex-direction: column;
-    align-items: flex-start;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Reduced motion preference */
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes scaleUp {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes floatSlow {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+
+  66% {
+    transform: translateY(-4px) rotate(-0.5deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes floatCard {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(0.5deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes leafDrift {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: translateY(-12px) rotate(3deg) scale(1.02);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(-1deg) scale(0.99);
+  }
+
+  75% {
+    transform: translateY(-14px) rotate(2deg) scale(1.01);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes fogDrift {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 0.35;
+  }
+
+  50% {
+    transform: translateX(-2%) scale(1.02);
+    opacity: 0.25;
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 0.35;
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes loadingBar {
+  0% {
+    width: 0%;
+  }
+
+  20% {
+    width: 25%;
+  }
+
+  50% {
+    width: 55%;
+  }
+
+  80% {
+    width: 80%;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes counterPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes markerPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(47, 107, 82, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 12px rgba(47, 107, 82, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(47, 107, 82, 0);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes softBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-6px);
+  }
+
+  60% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes progressFill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Ngatur detik-detik pergerakan animasi (kapan muncul, kapan hilang) */
+@keyframes slowZoom {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.06);
+  }
+}
+
+/* === BAGIAN 10: TAMPILAN RESPONSIF (BUAT HP / TABLET) ===
+Kumpulan kode di bawah ini khusus buat ngatur bentuk web kalo dibuka di layar kecil kayak HP */
+/* Ngatur tampilan web biar gak berantakan pas dibuka di layar HP atau Tablet */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -2868,416 +2447,7 @@ p, span, li, label, input, textarea, select, button {
     opacity: 1 !important;
     transform: none !important;
   }
-/* ============================================================
-   SPRINT 3 — ENHANCED SECTIONS
-   ============================================================ */
 
-/* ── OVERVIEW SECTION (SECTION 2) ── */
-.overview-section {
-  position: relative;
-}
-
-.overview-leaf-left {
-  position: absolute;
-  top: -50px;
-  left: -80px;
-  width: 250px;
-  opacity: 0.6;
-  pointer-events: none;
-  transform: rotate(-15deg);
-  z-index: 0;
-}
-
-.overview-leaf-right {
-  position: absolute;
-  bottom: -50px;
-  right: -80px;
-  width: 200px;
-  opacity: 0.5;
-  pointer-events: none;
-  transform: rotate(15deg) scaleX(-1);
-  z-index: 0;
-}
-
-.overview-divider {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  line-height: 0;
-  z-index: 2;
-  transform: translateY(50%);
-}
-
-.overview-divider img {
-  width: 100%;
-  height: 80px;
-  object-fit: cover;
-  object-position: top;
-}
-
-.overview-card-glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-2xl);
-  padding: var(--space-8) var(--space-6);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: var(--space-4);
-  cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: all var(--dur-base) var(--ease-spring);
-  position: relative;
-  z-index: 1;
-}
-
-.overview-card-glass:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255, 255, 255, 0.85);
-}
-
-.overview-card-icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-xl);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--space-2);
-  transition: transform var(--dur-base) var(--ease-spring);
-}
-
-.overview-card-glass:hover .overview-card-icon-wrap {
-  transform: scale(1.1);
-}
-
-.overview-card-counter {
-  margin-bottom: -10px;
-}
-
-.overview-count-num {
-  font-family: var(--font-heading);
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: var(--tracking-tight);
-}
-
-.overview-card-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  margin-top: auto;
-  opacity: 0.8;
-  transition: opacity var(--dur-fast), gap var(--dur-fast);
-}
-
-.overview-card-glass:hover .overview-card-cta {
-  opacity: 1;
-  gap: 8px;
-}
-
-/* ── TRANSPORTASI SECTION (SECTION 3) ── */
-.transport-leaf {
-  position: absolute;
-  top: 100px;
-  right: -50px;
-  width: 180px;
-  opacity: 0.4;
-  pointer-events: none;
-  transform: scaleX(-1);
-}
-
-.transport-card-premium {
-  position: relative;
-  height: 380px;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base);
-  background: var(--color-dark);
-}
-
-.transport-card-premium:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.transport-card-premium .transport-img-wrap {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-}
-
-.transport-card-premium .transport-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--dur-slow) var(--ease-smooth);
-}
-
-.transport-card-premium:hover .transport-img {
-  transform: scale(1.08);
-}
-
-.transport-badge-top {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  padding: 6px 14px;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  border-radius: var(--radius-pill);
-  z-index: 10;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(8px);
-}
-
-.badge-moda-bandros { background: rgba(216, 177, 92, 0.9); color: white; border: 1px solid rgba(255,255,255,0.2); }
-.badge-moda-tmb { background: rgba(58, 130, 195, 0.9); color: white; border: 1px solid rgba(255,255,255,0.2); }
-.badge-moda-angkot { background: rgba(47, 107, 82, 0.9); color: white; border: 1px solid rgba(255,255,255,0.2); }
-
-.transport-glass-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-6);
-  background: linear-gradient(to top, rgba(14, 35, 24, 0.95) 0%, rgba(14, 35, 24, 0.75) 60%, transparent 100%);
-  backdrop-filter: blur(4px);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  transform: translateY(0);
-  transition: transform var(--dur-base) var(--ease-smooth), padding var(--dur-base);
-}
-
-.transport-overlay-name {
-  font-family: var(--font-heading);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  line-height: var(--leading-tight);
-}
-
-.transport-overlay-desc {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.7);
-  line-height: var(--leading-relaxed);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.transport-overlay-stats,
-.transport-overlay-meta {
-  display: flex;
-  gap: var(--space-4);
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.transport-overlay-stat,
-.transport-overlay-meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.transport-overlay-stat {
-  font-weight: 600;
-  color: var(--color-accent);
-}
-
-.transport-overlay-meta {
-  padding-top: var(--space-2);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.transport-overlay-cta {
-  margin-top: var(--space-2);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 10px 0;
-  border-radius: var(--radius-lg);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--dur-fast), color var(--dur-fast);
-  width: 100%;
-}
-
-.transport-card-premium:hover .transport-overlay-cta {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-/* ── WISATA SECTION (SECTION 4) ── */
-.wisata-grid-scroll {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-6);
-  padding-bottom: var(--space-4);
-}
-
-@media (max-width: 900px) {
-  .wisata-grid-scroll {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-right: var(--section-padding-x);
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Hide scrollbar */
-  }
-  .wisata-grid-scroll::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.wisata-card-large {
-  position: relative;
-  height: 380px;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base);
-  background: var(--color-dark);
-}
-
-@media (max-width: 900px) {
-  .wisata-card-large {
-    flex-shrink: 0;
-    width: 280px;
-    scroll-snap-align: start;
-  }
-}
-
-.wisata-card-large:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.wisata-large-img-wrap {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-}
-
-.wisata-large-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--dur-slow) var(--ease-smooth);
-}
-
-.wisata-card-large:hover .wisata-large-img {
-  transform: scale(1.08);
-}
-
-.wisata-large-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 100%);
-  pointer-events: none;
-}
-
-.wisata-dist-pill {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  color: white;
-  z-index: 10;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(8px);
-}
-
-.badge-dist-near { background: rgba(47, 107, 82, 0.85); border: 1px solid rgba(255,255,255,0.2); }
-.badge-dist-mid { background: rgba(58, 130, 195, 0.85); border: 1px solid rgba(255,255,255,0.2); }
-.badge-dist-far { background: rgba(100, 100, 100, 0.85); border: 1px solid rgba(255,255,255,0.2); }
-
-.wisata-large-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-6);
-  z-index: 10;
-  color: white;
-}
-
-.wisata-large-name {
-  font-family: var(--font-heading);
-  font-size: var(--text-xl);
-  font-weight: 700;
-  margin-bottom: 6px;
-  line-height: var(--leading-snug);
-}
-
-.wisata-large-sub {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: rgba(255,255,255,0.7);
-}
-
-/* ── ENHANCED FOOTER ── */
-.footer-tagline {
-  font-family: var(--font-heading);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-accent);
-  margin-bottom: var(--space-2);
-}
-
-.footer-tim .footer-links {
-  gap: var(--space-4);
-}
-
-.footer-team-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.footer-team-name {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-.footer-team-nim {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4) !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
   *,
   ::before,
   ::after {
@@ -3288,4 +2458,127 @@ p, span, li, label, input, textarea, select, button {
     transition: none !important;
   }
 }
- }
+
+/* Ngatur tampilan web biar gak berantakan pas dibuka di layar HP atau Tablet */
+@media screen and (max-width: 1200px) {
+  .hero-container {
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+  }
+
+  .map-preview-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* Ngatur tampilan web biar gak berantakan pas dibuka di layar HP atau Tablet */
+@media screen and (max-width: 1024px) {
+  :root {
+    --section-padding-x: clamp(16px, 4vw, 48px);
+  }
+}
+
+/* Ngatur tampilan web biar gak berantakan pas dibuka di layar HP atau Tablet */
+@media screen and (max-width: 900px) {
+  .kh-nav-links {
+    display: none;
+  }
+
+  .kh-nav-hamburger {
+    display: flex;
+    color: white;
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .kh-navbar-wrapper.kh-navbar--scrolled .kh-nav-hamburger {
+    color: var(--color-text);
+    background: var(--color-sage);
+    border-color: var(--color-sage-dark);
+  }
+
+  .hero-container {
+    grid-template-columns: 1fr;
+    padding-bottom: 80px;
+  }
+
+  .hero-right {
+    order: -1;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .transport-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wisata-grid-scroll {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-right: var(--section-padding-x);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .wisata-grid-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .wisata-card-large {
+    flex-shrink: 0;
+    width: 280px;
+    scroll-snap-align: start;
+  }
+}
+
+/* Ngatur tampilan web biar gak berantakan pas dibuka di layar HP atau Tablet */
+@media screen and (max-width: 768px) {
+  :root {
+    --section-padding-x: 20px;
+    --section-padding-y: clamp(48px, 8vw, 72px);
+  }
+
+  .section-title {
+    font-size: var(--text-3xl);
+  }
+
+  .smart-hud-popup {
+    width: 260px;
+  }
+
+  [data-animate],
+  [data-animate="left"],
+  [data-animate="right"],
+  [data-animate="scale"] {
+    transition-duration: var(--dur-slow);
+  }
+
+  .hero-container {
+    grid-template-columns: 1fr;
+    padding-bottom: 100px;
+  }
+
+  .hero-cta-row {
+    flex-direction: column;
+  }
+
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Ngatur tampilan web biar gak berantakan pas dibuka di layar HP atau Tablet */
+@media screen and (max-width: 480px) {
+  :root {
+    --section-padding-x: 16px;
+  }
+
+  .section-header-split {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

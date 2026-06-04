@@ -3,12 +3,14 @@ import {
   MapContainer,
   TileLayer,
   GeoJSON,
+  Circle,
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import L from "leaflet";
 import api from "../api";
+import "./MapView.css";
 import {
   Bus,
   ArrowLeft,
@@ -26,6 +28,7 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronRight,
+  Search,
 } from "lucide-react";
 import { renderToString } from "react-dom/server";
 
@@ -89,7 +92,7 @@ const CustomToggle = ({ checked, onChange, color }) => (
   </div>
 );
 
-// KOMPONEN UTAMA MAP VIEW
+// page peta
 function MapView() {
   const BASE_RADIUS = 3500;
 
@@ -115,6 +118,9 @@ function MapView() {
   const [dynamicRadius, setDynamicRadius] = useState(BASE_RADIUS);
   const [flyTarget, setFlyTarget] = useState(null);
 
+  const location = useLocation();
+  const isPreview = new URLSearchParams(location.search).get("preview") === "true";
+
   // Accordion state
   const [accords, setAccords] = useState({
     basemap: false,
@@ -127,9 +133,9 @@ function MapView() {
     setAccords((prev) => ({ ...prev, [key]: !prev[key] }));
 
   // SPRINT 6: Moda Color System
-  const colorBrt = "#10b981"; // TMB = Green
-  const colorBus = "#D8B15C"; // Bandros = Gold
-  const colorAngkot = "#2F6B52"; // Angkot = Secondary Green
+  const colorBrt = "#3b82f6"; // TMB = Biru
+  const colorBus = "#f97316"; // Bandros = Oranye
+  const colorAngkot = "#10b981"; // Angkot = Hijau
 
   useEffect(() => {
     const fetchData = async () => {
@@ -636,19 +642,24 @@ function MapView() {
   );
 
   return (
-    <div className="map-page-wrapper">
-      {}
-      <aside className={`map-sidebar-premium ${openModal ? "open" : ""}`}>
-        {/* HEADER SIDEBAR */}
+    <div className={`map-page-wrapper ${isPreview ? "is-preview-mode" : ""}`}>
+      {!isPreview && (
+        <aside className={`map-sidebar-premium ${openModal ? "open" : ""}`}>
         <div className="sidebar-header-top">
           <Link to="/home" className="sidebar-back-link">
-            <ArrowLeft size={16} /> Beranda
+            <ArrowLeft size={15} /> Kembali
           </Link>
+          <div className="sidebar-brand">
+            <div>
+              <div className="sidebar-brand-name">Kabandung Heula</div>
+              <div className="sidebar-brand-sub">Peta Interaktif</div>
+            </div>
+          </div>
           <button
             className="sidebar-close-mobile"
             onClick={() => setOpenModal(false)}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -659,16 +670,10 @@ function MapView() {
               className="accordion-header"
               onClick={() => toggleAccordion("basemap")}
             >
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <MapIcon size={16} color="var(--color-primary)" /> Peta Dasar
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <MapIcon size={16} color="var(--color-primary)" /> Pilihan Peta
               </div>
-              {accords.basemap ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
+              {accords.basemap ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>
             <div className={`accordion-body ${accords.basemap ? "open" : ""}`}>
               <div className="basemap-toggle-group">
@@ -700,22 +705,13 @@ function MapView() {
               className="accordion-header"
               onClick={() => toggleAccordion("halte")}
             >
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <Bus size={16} color={colorBrt} /> Transportasi
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Bus size={16} color={colorBrt} /> Filter Transportasi
               </div>
-              {accords.halte ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
+              {accords.halte ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>
             <div className={`accordion-body ${accords.halte ? "open" : ""}`}>
-              <h3
-                className="sidebar-section-title"
-                style={{ marginTop: "8px" }}
-              >
+              <h3 className="sidebar-section-title" style={{ marginTop: "8px" }}>
                 Stasiun & Halte
               </h3>
               <div className="sidebar-card halte-card-group">
@@ -724,103 +720,51 @@ function MapView() {
                     key={type}
                     className="halte-card-item"
                     style={{
-                      borderBottom:
-                        idx < 2 ? "1px solid rgba(0,0,0,0.05)" : "none",
+                      borderBottom: idx < 2 ? "1px solid rgba(0,0,0,0.05)" : "none",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                      }}
-                    >
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                       <div
                         style={{
                           width: "10px",
                           height: "10px",
                           borderRadius: "50%",
-                          background:
-                            type === "brt"
-                              ? colorBrt
-                              : type === "bus"
-                                ? colorBus
-                                : colorAngkot,
+                          background: type === "brt" ? colorBrt : type === "bus" ? colorBus : colorAngkot,
                         }}
                       ></div>
-                      <span
-                        style={{
-                          color: "#334155",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {type === "brt"
-                          ? "Trans Metro"
-                          : type === "bus"
-                            ? "Bandros"
-                            : "Angkutan Kota"}
+                      <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>
+                        {type === "brt" ? "Trans Metro" : type === "bus" ? "Bandros" : "Angkutan Kota"}
                       </span>
                     </div>
                     <CustomToggle
                       checked={showHalte[type]}
-                      onChange={() =>
-                        setShowHalte({ ...showHalte, [type]: !showHalte[type] })
-                      }
-                      color={
-                        type === "brt"
-                          ? colorBrt
-                          : type === "bus"
-                            ? colorBus
-                            : colorAngkot
-                      }
+                      onChange={() => setShowHalte({ ...showHalte, [type]: !showHalte[type] })}
+                      color={type === "brt" ? colorBrt : type === "bus" ? colorBus : colorAngkot}
                     />
                   </div>
                 ))}
               </div>
 
-              <h3
-                className="sidebar-section-title"
-                style={{ marginTop: "16px" }}
-              >
+              <h3 className="sidebar-section-title" style={{ marginTop: "16px" }}>
                 Lintasan Rute
               </h3>
               {["brt", "angkot"].map((type) => {
-                const title =
-                  type === "brt" ? "Trans Metro Bandung" : "Angkutan Kota";
+                const title = type === "brt" ? "Trans Metro Bandung" : "Angkutan Kota";
                 const color = type === "brt" ? colorBrt : colorAngkot;
                 const isAllActive =
                   groupedRoutes[type]?.length > 0 &&
-                  groupedRoutes[type].every(
-                    (r) => activeRoutes[r.properties?.nama_rute?.trim()],
-                  );
+                  groupedRoutes[type].every((r) => activeRoutes[r.properties?.nama_rute?.trim()]);
 
                 return (
                   <div key={type} className="sidebar-card rute-card-group">
                     <div className="rute-card-header">
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "10px",
-                        }}
-                      >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <CustomToggle
                           checked={isAllActive}
-                          onChange={() =>
-                            toggleAllRoutesInType(type, !isAllActive)
-                          }
+                          onChange={() => toggleAllRoutesInType(type, !isAllActive)}
                           color={color}
                         />
-                        <span
-                          style={{
-                            color: "#334155",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {title}
-                        </span>
+                        <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>{title}</span>
                       </div>
                     </div>
                     <div className="rute-card-body">
@@ -832,19 +776,10 @@ function MapView() {
                             key={idx}
                             onClick={() => toggleRoute(name)}
                             className="route-item-modern"
-                            style={{
-                              display: "flex",
-                              alignItems: "flex-start",
-                              padding: "8px 0",
-                              cursor: "pointer",
-                            }}
+                            style={{ display: "flex", alignItems: "flex-start", padding: "8px 0", cursor: "pointer" }}
                           >
                             <div style={{ marginTop: "2px" }}>
-                              {isActive ? (
-                                <CheckSquare size={16} color={color} />
-                              ) : (
-                                <Square size={16} color="#94a3b8" />
-                              )}
+                              {isActive ? <CheckSquare size={16} color={color} /> : <Square size={16} color="#94a3b8" />}
                             </div>
                             <span
                               style={{
@@ -872,35 +807,15 @@ function MapView() {
               className="accordion-header"
               onClick={() => toggleAccordion("wisata")}
             >
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <MapPin size={16} color="#f43f5e" /> Wisata
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <MapPin size={16} color="#f43f5e" /> Filter Wisata
               </div>
-              {accords.wisata ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
+              {accords.wisata ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>
             <div className={`accordion-body ${accords.wisata ? "open" : ""}`}>
               <div className="sidebar-card">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#334155",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Kawasan Wisata
-                  </span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>Kawasan Wisata</span>
                   <CustomToggle
                     checked={showWisata}
                     onChange={() => {
@@ -911,73 +826,43 @@ function MapView() {
                   />
                 </div>
 
-                {/* CHECKBOX FILTER WISATA TERDEKAT */}
+                {/* SLIDER RADIUS */}
                 {showWisata && (
-                  <>
+                  <div style={{ marginTop: "16px", padding: "12px 10px", background: "#f8fafc", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "11px", fontWeight: "600", color: "#64748b" }}>
+                      <span>Radius Jangkauan</span>
+                      <span>{(dynamicRadius / 1000).toFixed(1)} KM</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="1000" 
+                      max="5000" 
+                      step="500" 
+                      value={dynamicRadius}
+                      onChange={(e) => setDynamicRadius(Number(e.target.value))}
+                      style={{ width: "100%", accentColor: "#f43f5e" }}
+                    />
+                    
                     <div
-                      onClick={() =>
-                        setShowNearbyWisataOnly(!showNearbyWisataOnly)
-                      }
+                      onClick={() => setShowNearbyWisataOnly(!showNearbyWisataOnly)}
                       className="route-item-modern"
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        padding: "12px 10px",
-                        marginTop: "16px",
-                        cursor: "pointer",
-                        borderRadius: "8px",
-                        background: "#f8fafc",
-                        border: "1px solid rgba(0,0,0,0.05)",
-                      }}
+                      style={{ display: "flex", alignItems: "flex-start", padding: "8px 0", marginTop: "8px", cursor: "pointer" }}
                     >
                       <div style={{ marginTop: "2px" }}>
-                        {showNearbyWisataOnly ? (
-                          <CheckSquare size={16} color="#f43f5e" />
-                        ) : (
-                          <Square size={16} color="#94a3b8" />
-                        )}
+                        {showNearbyWisataOnly ? <CheckSquare size={16} color="#f43f5e" /> : <Square size={16} color="#94a3b8" />}
                       </div>
-                      <span
-                        style={{
-                          color: showNearbyWisataOnly ? "#334155" : "#64748b",
-                          marginLeft: "10px",
-                          fontSize: "11px",
-                          fontWeight: showNearbyWisataOnly ? "600" : "400",
-                          lineHeight: "1.4",
-                        }}
-                      >
-                        Hanya wisata terdekat ({(BASE_RADIUS / 1000).toFixed(1)}{" "}
-                        KM) dari halte yang diklik
+                      <span style={{ color: showNearbyWisataOnly ? "#334155" : "#64748b", marginLeft: "10px", fontSize: "11px", fontWeight: showNearbyWisataOnly ? "600" : "400", lineHeight: "1.4" }}>
+                        Hanya wisata di dalam radius
                       </span>
                     </div>
 
                     {showNearbyWisataOnly && !focusedHalteLatLng && (
-                      <div
-                        style={{
-                          padding: "8px 10px",
-                          background: "rgba(244, 63, 94, 0.05)",
-                          color: "#e11d48",
-                          fontSize: "11px",
-                          borderRadius: "6px",
-                          border: "1px solid rgba(244, 63, 94, 0.2)",
-                          marginTop: "8px",
-                          lineHeight: "1.4",
-                        }}
-                      >
-                        <Info
-                          size={12}
-                          style={{
-                            display: "inline",
-                            verticalAlign: "middle",
-                            marginRight: "4px",
-                            position: "relative",
-                            top: "-1px",
-                          }}
-                        />
+                      <div style={{ padding: "8px 10px", background: "rgba(244, 63, 94, 0.05)", color: "#e11d48", fontSize: "11px", borderRadius: "6px", border: "1px solid rgba(244, 63, 94, 0.2)", marginTop: "8px", lineHeight: "1.4" }}>
+                        <Info size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px", position: "relative", top: "-1px" }} />
                         Klik halte di peta untuk melihat objek wisata terdekat.
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -986,40 +871,77 @@ function MapView() {
           <div style={{ height: "40px" }}></div>
         </div>
       </aside>
+      )}
 
-      {}
       <main className="map-container-main">
-        {/* TOP BAR / HUD */}
-        <div className="map-top-bar">
-          <button
-            className="sidebar-toggle-btn"
-            onClick={() => setOpenModal(true)}
-          >
-            <Filter size={16} /> Layer Filter
-          </button>
+        {/* HUD/TOP BAR untuk Mobile */}
+        {!isPreview && (
+          <div className="map-top-bar">
+            <button
+              className="sidebar-toggle-btn"
+              onClick={() => setOpenModal(true)}
+            >
+              <Filter size={16} /> Layer Filter
+            </button>
 
-          <div className="map-smart-hud">
-            <div className="hud-stat">
-              <MapPin size={14} color={colorBrt} /> <strong>59 Halte</strong>
+            <div className="map-smart-hud">
+              <div className="hud-stat">
+                <MapPin size={14} color={colorBrt} /> <strong>59 Halte</strong>
+              </div>
+              <div className="hud-divider"></div>
+              <div className="hud-stat">
+                <Bus size={14} color={colorBus} /> <strong>20 Rute</strong>
+              </div>
+              <div className="hud-divider"></div>
+              <div className="hud-stat">
+                <Activity size={14} color="#f43f5e" /> <strong>50+ Wisata</strong>
+              </div>
+              {(focusedRoute || focusedHalteLatLng) && (
+                <>
+                  <div className="hud-divider"></div>
+                  <button className="hud-reset-btn" onClick={handleMapClick}>
+                    Reset Fokus
+                  </button>
+                </>
+              )}
             </div>
-            <div className="hud-divider"></div>
-            <div className="hud-stat">
-              <Bus size={14} color={colorBus} /> <strong>20 Rute</strong>
-            </div>
-            <div className="hud-divider"></div>
-            <div className="hud-stat">
-              <Activity size={14} color="#f43f5e" /> <strong>50+ Wisata</strong>
-            </div>
-            {(focusedRoute || focusedHalteLatLng) && (
-              <>
-                <div className="hud-divider"></div>
-                <button className="hud-reset-btn" onClick={handleMapClick}>
-                  Reset Fokus
-                </button>
-              </>
-            )}
           </div>
-        </div>
+        )}
+
+        {/* FLOATING UI OVERLAY */}
+        {!isPreview && (
+          <div className="floating-ui-container">
+            {/* Top Search Bar */}
+            <div className="floating-search-bar">
+              <Search size={18} color="#9ca3af" />
+              <input 
+                type="text" 
+                className="floating-search-input" 
+                placeholder="Cari halte, rute, atau wisata..."
+              />
+            </div>
+
+            {/* Floating Legend */}
+            <div className="floating-legend">
+              <span style={{ color: "#1f2937" }}>Legenda</span>
+              <div className="legend-item">
+                <div className="legend-color" style={{ background: colorBrt }}></div> Trans Metro
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{ background: colorBus }}></div> Bandros
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{ background: colorAngkot }}></div> Angkot
+              </div>
+              <div className="legend-item">
+                <div className="legend-color" style={{ background: "#64748b" }}></div> Halte
+              </div>
+              <div className="legend-item">
+                <MapPin size={14} color="#f43f5e" /> Wisata
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* LEAFLET MAP */}
         <MapContainer
@@ -1028,7 +950,7 @@ function MapView() {
           className="leaflet-fullscreen"
           zoomControl={false}
           ref={mapRef}
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: "100%", height: "100%", zIndex: 10 }}
         >
           <MapController flyTarget={flyTarget} />
 
@@ -1038,18 +960,58 @@ function MapView() {
             url={getTileUrl()}
             attribution="&copy; WebGIS Transportasi Bandung"
           />
+          
+          {/* RADIUS LINGKARAN */}
+          {focusedHalteLatLng && (
+            <Circle 
+              center={focusedHalteLatLng}
+              radius={dynamicRadius}
+              pathOptions={{
+                color: "#f43f5e",
+                weight: 2,
+                dashArray: "10, 10",
+                fillColor: "#f43f5e",
+                fillOpacity: 0.05
+              }}
+            />
+          )}
 
           {/* LAYER WISATA */}
           {showWisata && wisataGeoJson && (
             <GeoJSON
               key={`wisata-gis-layer-${showWisata}-${showNearbyWisataOnly}-${focusedHalteLatLng?.lat || "none"}-${dynamicRadius}`}
               data={wisataGeoJson}
-              style={() => ({
-                color: "rgba(244,63,94,0.5)",
-                weight: 1.5,
-                fillColor: "#e11d48",
-                fillOpacity: 0.25,
-              })}
+              style={(feature) => {
+                let isInside = false;
+                if (focusedHalteLatLng) {
+                  let centroid = focusedHalteLatLng;
+                  if (feature.geometry?.type === "Point") {
+                    centroid = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                  } else {
+                    const coords = feature.geometry.type === "Polygon" ? feature.geometry.coordinates[0] : feature.geometry.coordinates[0][0];
+                    let latSum = 0, lngSum = 0;
+                    coords.forEach(c => { lngSum += c[0]; latSum += c[1]; });
+                    centroid = L.latLng(latSum / coords.length, lngSum / coords.length);
+                  }
+                  isInside = focusedHalteLatLng.distanceTo(centroid) <= dynamicRadius + 50;
+                }
+                
+                if (focusedHalteLatLng && isInside) {
+                  return {
+                    color: "#f43f5e",
+                    weight: 2,
+                    fillColor: "#f43f5e",
+                    fillOpacity: 0.7
+                  };
+                }
+                
+                return {
+                  color: "rgba(244,63,94,0.5)",
+                  weight: 1.5,
+                  fillColor: "#e11d48",
+                  fillOpacity: focusedHalteLatLng ? 0.1 : 0.25,
+                };
+              }}
               filter={filterWisataFeatures}
               onEachFeature={onEachWisataFeature}
             />
@@ -1079,6 +1041,6 @@ function MapView() {
       </main>
     </div>
   );
-}
+};
 
 export default MapView;
