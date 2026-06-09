@@ -3,6 +3,17 @@ from typing import Optional, List
 from datetime import time
 
 # ==========================================
+# SKEMA MODEL AUTH & USER
+# ==========================================
+class UserLogin(BaseModel):
+    email: str = Field(..., description="Email admin")
+    password: str = Field(..., description="Password admin")
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+# ==========================================
 # SKEMA MODEL HALTE
 # ==========================================
 class HalteBase(BaseModel):

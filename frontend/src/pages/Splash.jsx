@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import "./Splash.css";
+import api from "../api.js";
 
 import backgroundGedung from "../assets/asset_bandung/hero/gedung sate_2.png";
 import kabut from "../assets/asset_bandung/ornamen/Kabut.png";
@@ -37,11 +38,67 @@ export default function Splash() {
 
   const closeLogin = () => setShowLogin(false);
 
-  const handleLoginSubmit = (e) => {
+  async function handleLoginSubmit(e) {
     e.preventDefault();
     setLoginError("");
-    closeLogin();
-    navigate("/home");
+
+    const email = e.target.elements["admin-email"].value;
+    const password = e.target.elements["admin-password"].value;
+    
+    try {
+      const response = await api.post("/auth/login", {
+        email: email,
+        password: password
+      });
+
+      // Jika sukses, simpan token ke localStorage
+      localStorage.setItem("token", response.data.access_token);
+      
+      // Simpan status remember me
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "true");
+      }
+
+      closeLogin();
+      navigate("/home");
+    
+    } catch (error) {
+      // Tangani error jika kredensial salah
+      if (error.response) {
+        const status = error.response.status;
+        
+        switch (status) {
+          case 400:
+            setLoginError("Format data tidak valid. Periksa kembali input Anda.");
+            break;
+          case 401:
+            setLoginError("Email atau password salah.");
+            break;
+          case 403:
+            setLoginError("Anda tidak memiliki akses (Forbidden).");
+            break;
+          case 404:
+            setLoginError("Alamat login tidak ditemukan pada server.");
+            break;
+          case 422: // Sangat umum jika menggunakan FastAPI (Unprocessable Entity)
+            setLoginError("Input tidak sesuai dengan format yang diminta server.");
+            break;
+          case 500:
+          case 502:
+          case 503:
+            setLoginError("Terjadi kesalahan internal pada server. Silakan coba lagi nanti.");
+            break;
+          default:
+            setLoginError(`Gagal masuk (Error Code: ${status}).`);
+        }
+      } else if (error.request) {
+        // Permintaan terkirim tetapi tidak mendapat balasan (Server down, offline, atau masalah CORS)
+        setLoginError("Tidak dapat terhubung ke server. Periksa koneksi internet Anda atau pastikan server aktif.");
+      } else {
+        // Terjadi kesalahan saat frontend membuat/memproses request
+        setLoginError(`Terjadi kesalahan sistem: ${error.message}`);
+      }
+    }
   };
 
   // layar splash awal

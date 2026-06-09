@@ -3,6 +3,7 @@
 -- =========================================================================
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS rute_halte CASCADE;
 DROP TABLE IF EXISTS objek_wisata CASCADE;
 DROP TABLE IF EXISTS rute CASCADE;
@@ -10,6 +11,21 @@ DROP TABLE IF EXISTS halte CASCADE;
 
 DROP TYPE IF EXISTS jenis_halte;
 DROP TYPE IF EXISTS jenis_rute;
+
+-- =========================================================================
+-- PEMBUATAN TABEL USERS (Untuk Otentikasi Sederhana)
+-- =========================================================================
+-- Buat tabel users
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT true
+);
+
+-- Tambahkan user admin default (email: admin@gmail.com, password: admin123)
+INSERT INTO users (email, hashed_password) 
+VALUES ('admin@gmail.com', 'admin123');
 
 -- =========================================================================
 -- PEMBUATAN TIPE DATA ENUM (Moda Transportasi)
