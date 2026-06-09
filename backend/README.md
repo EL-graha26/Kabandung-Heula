@@ -12,6 +12,8 @@ Ini adalah *source code backend* untuk Sistem Informasi Geografis (SIG) Transpor
 *   **Server:** Uvicorn
 *   **Validasi Data:** Pydantic
 *   **Environment Manager:** `python-dotenv`
+*   **Password Hashing:** `passlib[bcrypt]`
+*   **Token Authentication:** `pyjwt`
 
 ---
 
@@ -46,7 +48,7 @@ venv\Scripts\activate
 Setelah *virtual environment* aktif (terlihat tanda `(venv)` di terminal), instal *dependencies* utama:
 
 ```bash
-pip install fastapi uvicorn asyncpg python-dotenv
+pip install fastapi uvicorn asyncpg python-dotenv passlib[bcrypt] pyjwt
 ```
 
 ### 3. Konfigurasi Database (Environment Variables)
@@ -109,6 +111,10 @@ Menangani data kawasan wisata dengan geometri berbentuk poligon.
 *   `POST /api/objek-wisata/` : Menambahkan poligon kawasan wisata baru.
 *   `PUT /api/objek-wisata/{id}` : Memperbarui data atau batas area wisata.
 *   `DELETE /api/objek-wisata/{id}` : Menghapus area wisata.
+
+### 4. Authentication
+Menangani login admin.
+* `Post /auth/login` : Memeriksa kredensial pengguna (email & password) dan membuat JWT Access Token untuk masuk ke mode Admin.
 
 ---
 
