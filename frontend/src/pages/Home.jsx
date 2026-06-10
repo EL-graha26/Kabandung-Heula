@@ -391,7 +391,6 @@ export default function Home() {
         </div>
       </section>
 
-# bagian Footer
       <footer id="footer" className="footer-section" role="contentinfo">
         <div className="footer-mountain" aria-hidden="true">
           <img src={footerGunung} alt="" />
