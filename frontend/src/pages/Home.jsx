@@ -443,15 +443,15 @@ export default function Home() {
             <h4 className="footer-col-title">Tim Pengembang</h4>
             <ul className="footer-links footer-team">
               <li className="footer-team-item">
-                <span className="footer-team-name">Muhammad Piela Nugraha</span>
-                <span className="footer-team-nim">123140200</span>
-              </li>
-              <li className="footer-team-item">
                 <span className="footer-team-name">Reihan Oktavian Putra</span>
                 <span className="footer-team-nim">123140202</span>
               </li>
               <li className="footer-team-item">
-                <span className="footer-team-name">Firman Gultom</span>
+                <span className="footer-team-name">Muhammad Piela Nugraha</span>
+                <span className="footer-team-nim">123140200</span>
+              </li>
+              <li className="footer-team-item">
+                <span className="footer-team-name">Firman H Gultom</span>
                 <span className="footer-team-nim">123140171</span>
               </li>
             </ul>
