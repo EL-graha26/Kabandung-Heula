@@ -21,10 +21,6 @@ export default function Splash() {
 
   const [phase, setPhase] = useState("splash");
   const [fadeOut, setFadeOut] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [loginError, setLoginError] = useState("");
 
   // tahan splash screen sebentar lalu masuk halaman utama
   useEffect(() => {
@@ -37,69 +33,6 @@ export default function Splash() {
   }, []);
 
   const closeLogin = () => setShowLogin(false);
-
-  async function handleLoginSubmit(e) {
-    e.preventDefault();
-    setLoginError("");
-
-    const email = e.target.elements["admin-email"].value;
-    const password = e.target.elements["admin-password"].value;
-    
-    try {
-      const response = await api.post("/auth/login", {
-        email: email,
-        password: password
-      });
-
-      // Jika sukses, simpan token ke localStorage
-      localStorage.setItem("token", response.data.access_token);
-      
-      // Simpan status remember me
-      if (rememberMe) {
-        localStorage.setItem("rememberMe", "true");
-      }
-
-      closeLogin();
-      navigate("/home");
-    
-    } catch (error) {
-      // Tangani error jika kredensial salah
-      if (error.response) {
-        const status = error.response.status;
-        
-        switch (status) {
-          case 400:
-            setLoginError("Format data tidak valid. Periksa kembali input Anda.");
-            break;
-          case 401:
-            setLoginError("Email atau password salah.");
-            break;
-          case 403:
-            setLoginError("Anda tidak memiliki akses (Forbidden).");
-            break;
-          case 404:
-            setLoginError("Alamat login tidak ditemukan pada server.");
-            break;
-          case 422: // Sangat umum jika menggunakan FastAPI (Unprocessable Entity)
-            setLoginError("Input tidak sesuai dengan format yang diminta server.");
-            break;
-          case 500:
-          case 502:
-          case 503:
-            setLoginError("Terjadi kesalahan internal pada server. Silakan coba lagi nanti.");
-            break;
-          default:
-            setLoginError(`Gagal masuk (Error Code: ${status}).`);
-        }
-      } else if (error.request) {
-        // Permintaan terkirim tetapi tidak mendapat balasan (Server down, offline, atau masalah CORS)
-        setLoginError("Tidak dapat terhubung ke server. Periksa koneksi internet Anda atau pastikan server aktif.");
-      } else {
-        // Terjadi kesalahan saat frontend membuat/memproses request
-        setLoginError(`Terjadi kesalahan sistem: ${error.message}`);
-      }
-    }
-  };
 
   // layar splash awal
   if (phase === "splash") {
@@ -167,138 +100,8 @@ export default function Splash() {
             </span>
             <ArrowRight size={16} />
           </button>
-
-          <button
-            id="btn-admin-login"
-            className="hero-cta-btn hero-cta-secondary"
-            onClick={() => setShowLogin(true)}
-          >
-            <span className="hero-btn-icon hero-btn-icon-lock">
-              <Lock size={20} strokeWidth={2} />
-            </span>
-            <span className="hero-btn-label">
-              <strong>Login Admin</strong>
-              <small>Kelola data &amp; sistem</small>
-            </span>
-          </button>
         </div>
       </div>
-
-      {/* modal form login */}
-      {showLogin && (
-        <div
-          className="modal-overlay"
-          onClick={closeLogin}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Modal masuk admin"
-        >
-          <div
-            className="login-glass-card animate-scale-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* tombol silang close */}
-            <button
-              className="modal-close-x"
-              onClick={closeLogin}
-              aria-label="Tutup modal"
-            >
-              <X size={15} />
-            </button>
-
-            {/* judul form */}
-            <div className="modal-header">
-              <div className="modal-icon" aria-hidden="true">
-                <Lock size={22} color="#10b981" />
-              </div>
-              <h2>Masuk ke Dashboard</h2>
-              <p>Gunakan akun admin untuk mengelola sistem</p>
-            </div>
-
-            {/* area form input */}
-            <form
-              onSubmit={handleLoginSubmit}
-              className="modal-form"
-              noValidate
-            >
-              <div className="form-group">
-                <label htmlFor="admin-email">Email</label>
-                <input
-                  id="admin-email"
-                  type="email"
-                  placeholder="admin@example.com"
-                  className="input"
-                  autoComplete="email"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="admin-password">Password</label>
-                <div className="input-password-wrap">
-                  <input
-                    id="admin-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    className="input"
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword((p) => !p)}
-                    aria-label={
-                      showPassword ? "Sembunyikan" : "Tampilkan password"
-                    }
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="login-row-extras">
-                <label className="remember-me">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={() => setRememberMe((r) => !r)}
-                  />
-                  <span>Ingat saya</span>
-                </label>
-                <button type="button" className="forgot-password">
-                  Lupa Password?
-                </button>
-              </div>
-
-              {loginError && <p className="login-error-msg">{loginError}</p>}
-
-              <button type="submit" className="btn-login-submit">
-                Masuk <ArrowRight size={16} />
-              </button>
-
-              <div className="modal-divider">
-                <span>atau</span>
-              </div>
-
-              <button
-                type="button"
-                className="btn-tamu"
-                onClick={() => {
-                  closeLogin();
-                  navigate("/home");
-                }}
-              >
-                <Users size={15} /> Eksplorasi Sebagai Tamu
-              </button>
-
-              <p className="login-tamu-note">
-                Nikmati peta dan informasi tanpa login
-              </p>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
