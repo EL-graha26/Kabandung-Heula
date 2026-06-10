@@ -1,6 +1,5 @@
 /* ============================================================
-   MAP VIEW — Layout, Sidebar, Filter Panel, Popup Halte
-   File ini menangani semua gaya untuk halaman peta interaktif.
+   MAP VIEW — Layout, Sidebar, Filter Panel, Popup & Icons
    ============================================================ */
 
 /* ── RESET LEAFLET DEFAULT ── */
@@ -8,7 +7,9 @@
   font-family: "Inter", sans-serif;
 }
 
-/* ── LAYOUT UTAMA: SIDEBAR KIRI + PETA KANAN ── */
+/* ════════════════════════════════════════════════════════════
+   LAYOUT UTAMA
+   ════════════════════════════════════════════════════════════ */
 .map-page-wrapper {
   display: flex;
   width: 100vw;
@@ -18,9 +19,9 @@
   font-family: "Inter", sans-serif;
 }
 
-/* ================================================================
-   NEW FLOATING UI & WHITE SIDEBAR
-   ================================================================ */
+/* ════════════════════════════════════════════════════════════
+   SIDEBAR KIRI
+   ════════════════════════════════════════════════════════════ */
 .map-sidebar-premium {
   width: 300px;
   min-width: 300px;
@@ -35,7 +36,7 @@
   flex-shrink: 0;
 }
 
-/* header atas sidebar — gradasi gelap elegan */
+/* header atas sidebar */
 .sidebar-header-top {
   display: flex;
   align-items: center;
@@ -47,7 +48,6 @@
   min-height: 64px;
 }
 
-/* tombol kembali ke beranda */
 .sidebar-back-link {
   display: flex;
   align-items: center;
@@ -66,7 +66,6 @@
   color: white;
 }
 
-/* nama app di tengah header */
 .sidebar-brand {
   display: flex;
   flex-direction: column;
@@ -84,7 +83,6 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* tombol tutup — hanya tampil di mobile */
 .sidebar-close-mobile {
   display: none;
   background: rgba(255, 255, 255, 0.12);
@@ -103,7 +101,6 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* area scroll konten sidebar */
 .sidebar-scrollable {
   flex: 1;
   overflow-y: auto;
@@ -117,10 +114,9 @@
   border-radius: 3px;
 }
 
-/* ================================================================
+/* ════════════════════════════════════════════════════════════
    ACCORDION
-   ================================================================ */
-/* header klik accordion */
+   ════════════════════════════════════════════════════════════ */
 .accordion-header {
   display: flex;
   align-items: center;
@@ -134,21 +130,15 @@
   user-select: none;
   border-bottom: 1px solid #f0f4f2;
 }
-.accordion-header:hover {
-  background: #f4f9f6;
-}
+.accordion-header:hover { background: #f4f9f6; }
 
-/* body accordion — animasi buka tutup */
 .accordion-body {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.accordion-body.open {
-  max-height: 1000px;
-}
+.accordion-body.open { max-height: 1200px; }
 
-/* judul sub-seksi kecil */
 .sidebar-section-title {
   font-size: 10px;
   font-weight: 700;
@@ -159,7 +149,6 @@
   margin: 0;
 }
 
-/* card pembungkus konten dalam accordion */
 .sidebar-card {
   margin: 6px 14px;
   background: #f7faf8;
@@ -168,9 +157,9 @@
   padding: 12px 14px;
 }
 
-/* ================================================================
-   TOGGLE BASEMAP
-   ================================================================ */
+/* ════════════════════════════════════════════════════════════
+   BASEMAP TOGGLE
+   ════════════════════════════════════════════════════════════ */
 .basemap-toggle-group {
   display: flex;
   gap: 8px;
@@ -192,21 +181,12 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.basemap-btn:hover {
-  border-color: #2f6b52;
-  color: #2f6b52;
-  background: #f0f9f4;
-}
-.basemap-btn.active {
-  border-color: #2f6b52;
-  background: #edf7f2;
-  color: #1a3a27;
-}
+.basemap-btn:hover  { border-color: #2f6b52; color: #2f6b52; background: #f0f9f4; }
+.basemap-btn.active { border-color: #2f6b52; background: #edf7f2; color: #1a3a27; }
 
-/* ================================================================
-   HALTE & RUTE CARDS
-   ================================================================ */
-/* card baris halte per moda */
+/* ════════════════════════════════════════════════════════════
+   HALTE CARD (dot icon per moda)
+   ════════════════════════════════════════════════════════════ */
 .halte-card-group {
   display: flex;
   flex-direction: column;
@@ -222,10 +202,23 @@
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* card grup rute */
-.rute-card-group {
-  margin-bottom: 8px;
+/* dot warna + emoji per moda */
+.halte-dot-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
+
+/* ════════════════════════════════════════════════════════════
+   RUTE CARD
+   ════════════════════════════════════════════════════════════ */
+.rute-card-group { margin-bottom: 8px; }
 .rute-card-header {
   display: flex;
   align-items: center;
@@ -233,19 +226,24 @@
   margin-bottom: 10px;
 }
 
-/* daftar rute — scrollable jika panjang */
+/* preview gaya garis rute */
+.route-line-preview {
+  display: inline-block;
+  height: 0;
+  width: 32px;
+  border-top-width: 3px;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
 .rute-card-body {
   max-height: 200px;
   overflow-y: auto;
   padding-right: 2px;
 }
 .rute-card-body::-webkit-scrollbar { width: 3px; }
-.rute-card-body::-webkit-scrollbar-thumb {
-  background: #c8ddd0;
-  border-radius: 3px;
-}
+.rute-card-body::-webkit-scrollbar-thumb { background: #c8ddd0; border-radius: 3px; }
 
-/* item rute per baris */
 .route-item-modern {
   display: flex;
   align-items: flex-start;
@@ -254,105 +252,20 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.route-item-modern:hover {
-  background: #f0f9f4;
-}
+.route-item-modern:hover { background: #f0f9f4; }
 
-/* ── FLOATING UI ELEMENTS ── */
-.floating-ui-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 600;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.floating-search-bar {
-  pointer-events: auto;
-  align-self: center;
-  width: 100%;
-  max-width: 400px;
-  background: white;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  gap: 10px;
-  border: 1px solid rgba(0,0,0,0.05);
-  margin-top: 10px;
-}
-
-.floating-search-input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: #333;
-  background: transparent;
-}
-
-.floating-search-input::placeholder {
-  color: #9ca3af;
-}
-
-.floating-legend {
-  pointer-events: auto;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border-radius: 30px;
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  font-size: 11px;
-  font-weight: 600;
-  color: #374151;
-  border: 1px solid rgba(0,0,0,0.05);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.legend-color {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.legend-icon-pin {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ================================================================
+/* ════════════════════════════════════════════════════════════
    AREA PETA KANAN
-   ================================================================ */
-/* wrapper area peta — mengambil sisa lebar setelah sidebar */
+   ════════════════════════════════════════════════════════════ */
 .map-container-main {
   flex: 1;
   position: relative;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* penting agar flex tidak overflow */
+  min-width: 0;
 }
 
-/* top bar mengambang di atas peta */
 .map-top-bar {
   position: absolute;
   top: 14px;
@@ -365,7 +278,6 @@
   pointer-events: none;
 }
 
-/* tombol buka sidebar (hanya tampil di mobile) */
 .sidebar-toggle-btn {
   display: flex;
   align-items: center;
@@ -382,12 +294,8 @@
   pointer-events: all;
   transition: all 0.2s;
 }
-.sidebar-toggle-btn:hover {
-  background: #f0f9f4;
-  border-color: #2f6b52;
-}
+.sidebar-toggle-btn:hover { background: #f0f9f4; border-color: #2f6b52; }
 
-/* HUD statistik cepat di atas peta */
 .map-smart-hud {
   display: flex;
   align-items: center;
@@ -409,18 +317,9 @@
   font-size: 12px;
   color: #475569;
 }
-.hud-stat strong {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 12px;
-}
-.hud-divider {
-  width: 1px;
-  height: 22px;
-  background: #dde8e2;
-}
+.hud-stat strong { font-weight: 700; color: #1e293b; font-size: 12px; }
+.hud-divider { width: 1px; height: 22px; background: #dde8e2; }
 
-/* tombol reset fokus rute/halte */
 .hud-reset-btn {
   padding: 7px 13px;
   background: #fef2f2;
@@ -433,27 +332,226 @@
   transition: background 0.2s;
   white-space: nowrap;
 }
-.hud-reset-btn:hover {
-  background: #fee2e2;
-}
+.hud-reset-btn:hover { background: #fee2e2; }
 
-/* ── Leaflet Map ── */
-/* container leaflet harus fullscreen mengisi sisa area */
+/* ════════════════════════════════════════════════════════════
+   LEAFLET MAP
+   ════════════════════════════════════════════════════════════ */
 .leaflet-fullscreen {
   flex: 1;
   width: 100% !important;
   height: 100% !important;
   position: absolute !important;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
 }
 
-/* ================================================================
+/* ════════════════════════════════════════════════════════════
+   FLOATING UI: SEARCH + LEGEND
+   ════════════════════════════════════════════════════════════ */
+.floating-ui-container {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 600;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Search Wrapper ── */
+.floating-search-wrapper {
+  pointer-events: auto;
+  align-self: center;
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  margin-top: 10px;
+}
+
+.floating-search-bar {
+  width: 100%;
+  background: white;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  gap: 10px;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.floating-search-bar:focus-within {
+  box-shadow: 0 4px 24px rgba(47, 107, 82, 0.18);
+  border-color: #2f6b52;
+}
+
+.floating-search-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: #333;
+  background: transparent;
+}
+.floating-search-input::placeholder { color: #9ca3af; }
+
+.search-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.2s;
+}
+.search-clear-btn:hover { color: #374151; }
+
+/* Dropdown hasil pencarian */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease;
+  z-index: 700;
+}
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid #f8fafc;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: #f8fafc; }
+
+.search-result-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.search-result-text { flex: 1; }
+.search-result-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.3;
+}
+.search-result-sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* ── Legenda Horizontal Tengah ── */
+.floating-legend-horizontal {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 50px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  width: max-content;
+  max-width: 90%;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 600;
+}
+
+.legend-item-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #334155;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.legend-divider {
+  width: 1px;
+  height: 24px;
+  background: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.legend-icon-wrap {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: white;
+}
+
+.legend-line {
+  width: 24px;
+  height: 0;
+  border-top-width: 3px;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.wisata-legend-icon {
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid white;
+  box-shadow: 0 2px 4px rgba(244, 63, 94, 0.4);
+}
+.wisata-legend-inner {
+  transform: rotate(45deg);
+  font-size: 11px;
+}
+
+/* ════════════════════════════════════════════════════════════
    POPUP HALTE PREMIUM
-   ================================================================ */
-/* override default Leaflet popup */
+   ════════════════════════════════════════════════════════════ */
 .leaflet-popup-content-wrapper {
   border-radius: 16px !important;
   padding: 0 !important;
@@ -461,16 +559,9 @@
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
-.leaflet-popup-content {
-  margin: 0 !important;
-  width: auto !important;
-}
-/* sembunyikan ekor segitiga popup */
-.leaflet-popup-tip-container {
-  display: none;
-}
+.leaflet-popup-content { margin: 0 !important; width: auto !important; }
+.leaflet-popup-tip-container { display: none; }
 
-/* popup card halte */
 .premium-halte-popup {
   font-family: "Inter", sans-serif;
   color: #334155;
@@ -480,7 +571,6 @@
   background: white;
 }
 
-/* gambar header popup */
 .premium-popup-header {
   position: relative;
   height: 110px;
@@ -494,10 +584,22 @@
 .premium-popup-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
 }
 
-/* isi popup */
+/* badge jenis moda di foto */
+.halte-type-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.03em;
+}
+
 .premium-popup-body { padding: 14px; }
 .premium-popup-title-row {
   display: flex;
@@ -514,7 +616,6 @@
   line-height: 1.3;
 }
 
-/* badge status aktif/tidak */
 .premium-popup-status {
   font-size: 10px;
   font-weight: 700;
@@ -523,10 +624,9 @@
   flex-shrink: 0;
   margin-top: 2px;
 }
-.status-aktif { background: #dcfce7; color: #16a34a; }
+.status-aktif    { background: #dcfce7; color: #16a34a; }
 .status-nonaktif { background: #fee2e2; color: #dc2626; }
 
-/* info meta operasional */
 .premium-popup-meta {
   display: flex;
   flex-direction: column;
@@ -543,16 +643,8 @@
   font-size: 11px;
 }
 .meta-label { color: #64748b; }
-.badge-moda {
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-  text-transform: uppercase;
-}
 
-/* seksi wisata terdekat dalam popup */
+/* wisata terdekat dalam popup halte */
 .radar-tourism-section { margin-bottom: 12px; }
 .radar-tourism-title {
   display: flex;
@@ -565,11 +657,7 @@
   letter-spacing: 0.05em;
   margin-bottom: 6px;
 }
-.radar-tourism-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.radar-tourism-list { display: flex; flex-direction: column; gap: 4px; }
 .radar-tourism-item {
   display: flex;
   justify-content: space-between;
@@ -582,33 +670,141 @@
 .radar-tourism-name { color: #334155; font-weight: 500; }
 .radar-tourism-dist { color: #2f6b52; font-weight: 700; font-size: 10px; }
 
-/* tombol utama popup */
-.premium-popup-cta {
-  width: 100%;
-  padding: 10px;
-  color: white;
+/* ════════════════════════════════════════════════════════════
+   IKON WISATA — Marker Pin
+   ════════════════════════════════════════════════════════════ */
+.wisata-marker-pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+}
+.wisata-marker-inner {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid white;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.4);
+  font-size: 16px;
+}
+.wisata-marker-inner::after {
+  content: attr(data-emoji);
+  transform: rotate(45deg);
+  display: block;
+}
+/* Rotate emoji back */
+.wisata-marker-pin .wisata-marker-inner {
+  font-style: normal;
+}
+.wisata-marker-pin .wisata-marker-inner > * {
+  transform: rotate(45deg);
+}
+/* Tail */
+.wisata-marker-tail {
+  width: 2px;
+  height: 8px;
+  background: #e11d48;
+  border-radius: 0 0 2px 2px;
+  opacity: 0.6;
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODAL LOGIN & CRUD
+   ════════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.login-glass-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.animate-scale-in { animation: scale-in 0.2s ease; }
+
+.modal-close-x {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: #f1f5f9;
   border: none;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 8px;
+  width: 30px; height: 30px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: filter 0.2s;
+  color: #64748b;
+  transition: background 0.2s;
 }
-.premium-popup-cta:hover { filter: brightness(1.1); }
+.modal-close-x:hover { background: #e2e8f0; }
 
-/* ================================================================
+.modal-header { text-align: center; margin-bottom: 20px; }
+.modal-icon {
+  width: 52px; height: 52px;
+  background: #ecfdf5;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.modal-header h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 4px; }
+.modal-header p  { font-size: 13px; color: #64748b; margin: 0; }
+
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; font-weight: 600; color: #334155; }
+
+.input {
+  padding: 10px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: "Inter", sans-serif;
+  color: #1e293b;
+  background: white;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.input:focus { border-color: #10b981; }
+
+.input-password-wrap { position: relative; }
+.password-toggle {
+  position: absolute;
+  right: 10px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  cursor: pointer; color: #94a3b8;
+}
+
+/* ════════════════════════════════════════════════════════════
    RESPONSIVE MOBILE
-   ================================================================ */
+   ════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* sidebar jadi overlay fullscreen di mobile */
   .map-sidebar-premium {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     width: 100%;
     max-width: 300px;
     transform: translateX(-100%);
@@ -620,20 +816,23 @@
     transform: translateX(0);
     box-shadow: 4px 0 40px rgba(0, 0, 0, 0.2);
   }
-  /* tampilkan tombol close di mobile */
-  .sidebar-close-mobile {
-    display: flex;
+  .sidebar-close-mobile { display: flex; }
+  .map-top-bar { top: 10px; left: 10px; right: 10px; }
+
+  /* Legenda bisa ditarik ke tengah atau dibiarkan kecil di bawah kalau di mobile */
+  .floating-legend-horizontal {
+    left: 50%;
+    bottom: 16px;
+    width: 90%;
+    padding: 10px 14px;
+    gap: 8px;
   }
-  .map-top-bar {
-    top: 10px;
-    left: 10px;
-    right: 10px;
+  .legend-item-pill span {
+    font-size: 10px;
   }
 }
 
-/* tombol filter hanya di mobile */
 @media (min-width: 769px) {
-  .sidebar-toggle-btn {
-    display: none;
-  }
+  /* Tombol filter sidebar hanya muncul di mobile */
+  .sidebar-toggle-btn { display: none; }
 }

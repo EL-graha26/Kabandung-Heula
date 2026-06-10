@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -35,7 +35,16 @@ import {
   EyeOff,
   Users,
   LogOut,
-  Plus
+  Plus,
+  Train,
+  Bike,
+  Landmark,
+  TreePine,
+  Camera,
+  Coffee,
+  Waves,
+  Mountain,
+  Star,
 } from "lucide-react";
 import { renderToString } from "react-dom/server";
 
@@ -43,7 +52,79 @@ import bandrosImg from "../assets/asset_bandung/Transportasi/bandros.jpg";
 import tmbImg from "../assets/asset_bandung/Transportasi/trans metro bandung.jpg";
 import angkotImg from "../assets/asset_bandung/Transportasi/angkot.png";
 
-// KOMPONEN PENGENDALI FLY-TO PETA
+// ─────────────────────────────────────────────────────────────────────────────
+//  WARNA TRANSPORTASI — satu sumber kebenaran
+// ─────────────────────────────────────────────────────────────────────────────
+const COLOR = {
+  brt:    "#3b82f6",   // biru   — Trans Metro Bandung
+  bus:    "#f97316",   // oranye — Bandros
+  angkot: "#10b981",   // hijau  — Angkutan Kota
+  wisata: "#f43f5e",   // merah  — Kawasan Wisata
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPER: deteksi jenis transportasi dari string jenis
+//  /* Ini fungsi buat nebak ini tuh angkot, bus, atau trans metro dari teks jenisnya */
+// ─────────────────────────────────────────────────────────────────────────────
+const getTransType = (jenis = "") => {
+  const j = String(jenis).toLowerCase();
+  if (j.includes("brt") || j.includes("trans")) return "brt";
+  if (j.includes("angkot"))                      return "angkot";
+  return "bus";
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPER: hitung centroid dari fitur GeoJSON
+// ─────────────────────────────────────────────────────────────────────────────
+const getCentroid = (feature) => {
+  const geom = feature?.geometry;
+  if (!geom) return null;
+  if (geom.type === "Point") {
+    return L.latLng(geom.coordinates[1], geom.coordinates[0]);
+  }
+  const ring =
+    geom.type === "Polygon"
+      ? geom.coordinates[0]
+      : geom.type === "MultiPolygon"
+      ? geom.coordinates[0][0]
+      : null;
+  if (!ring) return null;
+  let latSum = 0, lngSum = 0;
+  ring.forEach((c) => { lngSum += c[0]; latSum += c[1]; });
+  return L.latLng(latSum / ring.length, lngSum / ring.length);
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPER: format jarak meter → teks
+// ─────────────────────────────────────────────────────────────────────────────
+const formatDist = (m) =>
+  m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HELPER: ikon wisata berdasarkan nama/deskripsi
+// ─────────────────────────────────────────────────────────────────────────────
+const getWisataIcon = (nama = "", desc = "") => {
+  const t = (nama + " " + desc).toLowerCase();
+  if (t.includes("taman") || t.includes("park") || t.includes("kebun"))
+    return "🌿";
+  if (t.includes("air") || t.includes("kolam") || t.includes("situ") || t.includes("danau"))
+    return "💧";
+  if (t.includes("gunung") || t.includes("bukit") || t.includes("tebing"))
+    return "⛰️";
+  if (t.includes("museum") || t.includes("gedung") || t.includes("istana") || t.includes("palace"))
+    return "🏛️";
+  if (t.includes("masjid") || t.includes("gereja") || t.includes("vihara") || t.includes("pura"))
+    return "🕌";
+  if (t.includes("kuliner") || t.includes("cafe") || t.includes("resto") || t.includes("food"))
+    return "🍽️";
+  if (t.includes("pantai") || t.includes("laut") || t.includes("beach"))
+    return "🏖️";
+  return "📸";
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  KOMPONEN: Pengendali fly-to peta
+// ─────────────────────────────────────────────────────────────────────────────
 function MapController({ flyTarget }) {
   const map = useMap();
   useEffect(() => {
@@ -57,20 +138,22 @@ function MapController({ flyTarget }) {
   return null;
 }
 
-// KOMPONEN PENDETEKSI KLIK PETA
+// ─────────────────────────────────────────────────────────────────────────────
+//  KOMPONEN: Pendeteksi klik peta
+// ─────────────────────────────────────────────────────────────────────────────
 function MapEventHandler({ onMapClick }) {
-  useMapEvents({
-    click: () => {
-      onMapClick();
-    },
-  });
+  useMapEvents({ click: () => onMapClick() });
   return null;
 }
 
-// KOMPONEN CUSTOM UI: TOGGLE SWITCH
+// ─────────────────────────────────────────────────────────────────────────────
+//  KOMPONEN: Toggle switch kustom
+// ─────────────────────────────────────────────────────────────────────────────
 const CustomToggle = ({ checked, onChange, color }) => (
   <div
     onClick={onChange}
+    role="switch"
+    aria-checked={checked}
     style={{
       width: "40px",
       height: "22px",
@@ -92,55 +175,121 @@ const CustomToggle = ({ checked, onChange, color }) => (
         position: "absolute",
         top: "2px",
         left: checked ? "20px" : "2px",
-        transition: "left 0.3s ease, transform 0.3s ease",
+        transition: "left 0.3s ease",
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
       }}
-    ></div>
+    />
   </div>
 );
 
-// page peta
+// ─────────────────────────────────────────────────────────────────────────────
+//  IKON HALTE — berbeda per moda transportasi
+//  /* Ini bagian icon angkot, bus, dan BRT yang tampil di peta. Pakai emoji biar enteng dan beda warna */
+// ─────────────────────────────────────────────────────────────────────────────
+const createHalteIcon = (jenisStr, isFocused) => {
+  const type  = getTransType(jenisStr);
+  const color = COLOR[type];
+  const emoji = type === "brt" ? "🚌" : type === "angkot" ? "🚐" : "🚎";
+
+  const size = isFocused ? 36 : 28;
+  const ring = isFocused ? `box-shadow: 0 0 0 4px ${color}40, 0 4px 10px rgba(0,0,0,0.3);` : "box-shadow: 0 2px 6px rgba(0,0,0,0.3);";
+
+  const html = `
+    <div style="
+      width:${size}px; height:${size}px;
+      border-radius:50%;
+      background:${color};
+      border:2.5px solid white;
+      ${ring}
+      display:flex; align-items:center; justify-content:center;
+      font-size: ${isFocused ? 18 : 14}px;
+      transition:all 0.2s ease;
+    ">
+      ${emoji}
+    </div>`;
+
+  return L.divIcon({
+    html,
+    className: "",
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -(size / 2 + 4)],
+  });
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  IKON WISATA — marker pin berwarna dengan emoji kategori
+// ─────────────────────────────────────────────────────────────────────────────
+const createWisataIcon = (nama = "", deskripsi = "") => {
+  const emoji = getWisataIcon(nama, deskripsi);
+  const html = `
+    <div class="wisata-marker-pin">
+      <div class="wisata-marker-inner">${emoji}</div>
+      <div class="wisata-marker-tail"></div>
+    </div>`;
+  return L.divIcon({
+    html,
+    className: "",
+    iconSize: [36, 44],
+    iconAnchor: [18, 44],
+    popupAnchor: [0, -46],
+  });
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  HALAMAN PETA UTAMA
+// ─────────────────────────────────────────────────────────────────────────────
 function MapView() {
   const BASE_RADIUS = 3500;
 
-  // State Map & UI
-  const [openModal, setOpenModal] = useState(false);
-  const [layerType, setLayerType] = useState("default");
+  // ── State Peta & Data ──
+  const [openModal,    setOpenModal]    = useState(false);
+  const [layerType,    setLayerType]    = useState("default");
   const [routeGeoJson, setRouteGeoJson] = useState(null);
   const [halteGeoJson, setHalteGeoJson] = useState(null);
-  const [wisataGeoJson, setWisataGeoJson] = useState(null);
+  const [wisataGeoJson,setWisataGeoJson]= useState(null);
   const mapRef = useRef(null);
 
-  const [showWisata, setShowWisata] = useState(true);
-  const [showNearbyWisataOnly, setShowNearbyWisataOnly] = useState(false);
-  const [showHalte, setShowHalte] = useState({ brt: true, bus: true, angkot: true });
-  const [activeRoutes, setActiveRoutes] = useState({});
+  // ── State Visibilitas Layer ──
+  const [showWisata,          setShowWisata]          = useState(true);
+  const [showNearbyWisataOnly,setShowNearbyWisataOnly]= useState(false);
+  const [showHalte,           setShowHalte]           = useState({ brt: true, bus: true, angkot: true });
+  const [activeRoutes,        setActiveRoutes]        = useState({});
 
-  const [focusedRoute, setFocusedRoute] = useState(null);
+  // ── State Fokus & Navigasi ──
+  const [focusedRoute,       setFocusedRoute]       = useState(null);
   const [focusedHalteLatLng, setFocusedHalteLatLng] = useState(null);
-  const [dynamicRadius, setDynamicRadius] = useState(BASE_RADIUS);
-  const [flyTarget, setFlyTarget] = useState(null);
+  const [dynamicRadius,      setDynamicRadius]      = useState(BASE_RADIUS);
+  const [flyTarget,          setFlyTarget]          = useState(null);
 
-  const location = useLocation();
+  // ── State Pencarian ──
+  const [searchQuery,   setSearchQuery]   = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown,  setShowDropdown]  = useState(false);
+  const searchRef = useRef(null);
+
+  const location  = useLocation();
   const isPreview = new URLSearchParams(location.search).get("preview") === "true";
 
-  // State Autentikasi (Admin)
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
+  // ── State Admin ──
+  const [isAdmin,      setIsAdmin]      = useState(false);
+  const [showLogin,    setShowLogin]    = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [loginError, setLoginError] = useState("");
-  
-  // --- STATE CRUD ADMIN ---
+  const [loginError,   setLoginError]   = useState("");
+
+  // ── State CRUD ──
   const [crudModal, setCrudModal] = useState({
-    open: false,
-    action: "", // 'edit', 'tambah', 'delete'
-    type: "",   // 'halte', 'rute', 'wisata'
-    id: null,
-    formData: {}
+    open: false, action: "", type: "", id: null, formData: {},
   });
 
-  // Fungsi Tarik Data Peta
+  // ── State Accordion ──
+  const [accords, setAccords] = useState({ basemap: false, wisata: true, halte: true, rute: false });
+  const toggleAccordion = (key) => setAccords((p) => ({ ...p, [key]: !p[key] }));
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  FETCH DATA
+  //  /* Ini buat narik data JSON peta (halte, rute, wisata) dari backend pas halaman baru dibuka */
+  // ─────────────────────────────────────────────────────────────────────────
   const fetchData = useCallback(async () => {
     try {
       const [resRoute, resHalte, resWisata] = await Promise.all([
@@ -148,347 +297,336 @@ function MapView() {
         api.get("/halte/data/geojson"),
         api.get("/objek-wisata/data/geojson"),
       ]);
-
       setRouteGeoJson(resRoute.data);
       setHalteGeoJson(resHalte.data);
       setWisataGeoJson(resWisata.data);
 
       if (resRoute.data?.features) {
-        const initialActive = {};
+        const initial = {};
         resRoute.data.features.forEach((f) => {
-          const nama = f.properties?.nama_rute;
-          if (nama) initialActive[nama.trim()] = true;
+          const nm = f.properties?.nama_rute;
+          if (nm) initial[nm.trim()] = true;
         });
-        setActiveRoutes((prev) => Object.keys(prev).length === 0 ? initialActive : prev);
+        setActiveRoutes((prev) => (Object.keys(prev).length === 0 ? initial : prev));
       }
-    } catch (error) {
-      console.error("Gagal memuat data GIS", error);
+    } catch (err) {
+      console.error("Gagal memuat data GIS:", err);
     }
   }, []);
 
-  // Ambil data pertama kali & set status Admin
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) setIsAdmin(true);
     fetchData();
   }, [fetchData]);
 
-  // Hooking tombol di pop-up Leaflet ke state React
+  // ─────────────────────────────────────────────────────────────────────────
+  //  SEARCH — dibangun dari data GeoJSON yang sudah ada
+  //  /* Ini fitur search: nyatuin data halte, rute, wisata ke satu index biar cepat dicarinya */
+  // ─────────────────────────────────────────────────────────────────────────
+  // Bangun indeks pencarian (flat list) dari semua fitur
+  const searchIndex = useMemo(() => {
+    const items = [];
+    halteGeoJson?.features?.forEach((f) => {
+      const nama = f.properties?.nama;
+      if (!nama) return;
+      const latlng = getCentroid(f);
+      if (latlng) items.push({ type: "halte", label: nama, sublabel: f.properties?.jenis || "Halte", latlng, feature: f });
+    });
+    wisataGeoJson?.features?.forEach((f) => {
+      const nama = f.properties?.nama_wisata;
+      if (!nama) return;
+      const latlng = getCentroid(f);
+      if (latlng) items.push({ type: "wisata", label: nama, sublabel: "Kawasan Wisata", latlng, feature: f });
+    });
+    routeGeoJson?.features?.forEach((f) => {
+      const nama = f.properties?.nama_rute;
+      if (!nama) return;
+      // Ambil titik tengah dari array koordinat rute
+      const coords = f.geometry?.coordinates;
+      if (!coords || coords.length === 0) return;
+      const mid = coords[Math.floor(coords.length / 2)];
+      if (!mid) return;
+      const latlng = L.latLng(mid[1], mid[0]);
+      items.push({ type: "rute", label: nama, sublabel: f.properties?.jenis || "Rute", latlng, feature: f });
+    });
+    return items;
+  }, [halteGeoJson, wisataGeoJson, routeGeoJson]);
+
+  // Filter hasil pencarian
   useEffect(() => {
-    window.handleAdminAction = (action, type, id) => {
-      setCrudModal({ 
-        open: true, 
-        action: action, 
-        type: type, 
-        id: id, 
-        formData: {} 
-      });
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    const filtered = searchIndex.filter(
+      (item) =>
+        item.label.toLowerCase().includes(q) ||
+        item.sublabel.toLowerCase().includes(q)
+    );
+    setSearchResults(filtered.slice(0, 8));
+    setShowDropdown(filtered.length > 0);
+  }, [searchQuery, searchIndex]);
+
+  // Tutup dropdown saat klik di luar
+  useEffect(() => {
+    const handler = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
     };
-    return () => {
-      delete window.handleAdminAction;
-    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Efek untuk menarik data lama ke dalam form
-  useEffect(() => {
-    if (crudModal.open && crudModal.action === "edit" && crudModal.id) {
-      let feature = null;
-      if (crudModal.type === "halte" && halteGeoJson) {
-        feature = halteGeoJson.features.find((f) => String(f.properties?.id_halte) === String(crudModal.id) || String(f.properties?.kode) === String(crudModal.id));
-      } else if (crudModal.type === "rute" && routeGeoJson) {
-        feature = routeGeoJson.features.find((f) => String(f.properties?.id_rute) === String(crudModal.id) || String(f.properties?.kode_rute) === String(crudModal.id));
-      } else if (crudModal.type === "wisata" && wisataGeoJson) {
-        feature = wisataGeoJson.features.find((f) => String(f.properties?.id_wisata) === String(crudModal.id) || String(f.properties?.kode_wisata) === String(crudModal.id));
-      }
+  const handleSearchSelect = (item) => {
+    setFlyTarget({ latlng: item.latlng, zoom: item.type === "rute" ? 14 : 16 });
+    setSearchQuery(item.label);
+    setShowDropdown(false);
 
-      if (feature && feature.properties) {
-        const data = { ...feature.properties };
-        // Ekstrak koordinat untuk diedit jika point
-        if (feature.geometry?.type === "Point") {
-          data.longitude = feature.geometry.coordinates[0];
-          data.latitude = feature.geometry.coordinates[1];
-        }
-        setCrudModal((prev) => ({ ...prev, formData: data }));
+    // Fokuskan rute jika item adalah rute
+    if (item.type === "rute") {
+      setFocusedRoute(item.feature.properties?.nama_rute?.trim() || null);
+    }
+    // Fokuskan halte jika item adalah halte
+    if (item.type === "halte") {
+      setFocusedHalteLatLng(item.latlng);
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  //  ADMIN — hook popup
+  // ─────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    window.handleAdminAction = (action, type, id) => {
+      setCrudModal({ open: true, action, type, id, formData: {} });
+    };
+    return () => { delete window.handleAdminAction; };
+  }, []);
+
+  // Isi form edit
+  useEffect(() => {
+    if (!crudModal.open || crudModal.action !== "edit" || !crudModal.id) return;
+    let feature = null;
+    if (crudModal.type === "halte" && halteGeoJson) {
+      feature = halteGeoJson.features.find(
+        (f) => String(f.properties?.id_halte) === String(crudModal.id) ||
+               String(f.properties?.kode)     === String(crudModal.id)
+      );
+    } else if (crudModal.type === "rute" && routeGeoJson) {
+      feature = routeGeoJson.features.find(
+        (f) => String(f.properties?.id_rute)   === String(crudModal.id) ||
+               String(f.properties?.kode_rute) === String(crudModal.id)
+      );
+    } else if (crudModal.type === "wisata" && wisataGeoJson) {
+      feature = wisataGeoJson.features.find(
+        (f) => String(f.properties?.id_wisata)    === String(crudModal.id) ||
+               String(f.properties?.kode_wisata)  === String(crudModal.id)
+      );
+    }
+    if (feature?.properties) {
+      const data = { ...feature.properties };
+      if (feature.geometry?.type === "Point") {
+        data.longitude = feature.geometry.coordinates[0];
+        data.latitude  = feature.geometry.coordinates[1];
       }
+      setCrudModal((p) => ({ ...p, formData: data }));
     }
   }, [crudModal.open, crudModal.action, crudModal.id, crudModal.type, halteGeoJson, routeGeoJson, wisataGeoJson]);
 
-  // Fungsi untuk menangani ketikan user di form
   const handleCrudChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setCrudModal((prev) => ({
-      ...prev,
-      formData: {
-        ...prev.formData,
-        [name]: type === "checkbox" ? checked : value,
-      },
+    setCrudModal((p) => ({
+      ...p,
+      formData: { ...p.formData, [name]: type === "checkbox" ? checked : value },
     }));
   };
 
-  // -------------------------------------------------------------
-  // FUNGSI SUBMIT CRUD (TERHUBUNG KE BACKEND)
-  // -------------------------------------------------------------
   const handleCrudSubmit = async (e) => {
     if (e) e.preventDefault();
     try {
       const { action, type, id, formData } = crudModal;
-      
-      // Penentuan endpoint sesuai dengan tipe data
-      let endpoint = "";
-      if (type === "halte") endpoint = "/halte";
-      else if (type === "rute") endpoint = "/rute";
-      else if (type === "wisata") endpoint = "/objek-wisata";
+      const endpointMap = { halte: "/halte", rute: "/rute", wisata: "/objek-wisata" };
+      const endpoint = endpointMap[type] || "";
+      const token  = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      // Konfigurasi Header Otorisasi JWT
-      const token = localStorage.getItem("token");
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      };
+      if (action === "edit")    await api.put(`${endpoint}/${id}`, formData, config);
+      else if (action === "tambah") await api.post(endpoint, formData, config);
+      else if (action === "delete") await api.delete(`${endpoint}/${id}`, config);
 
-      if (action === "edit") {
-        await api.put(`${endpoint}/${id}`, formData, config);
-        alert(`Sukses! Data ${type} berhasil diperbarui.`);
-      } else if (action === "tambah") {
-        await api.post(endpoint, formData, config);
-        alert(`Sukses! Data ${type} berhasil ditambahkan.`);
-      } else if (action === "delete") {
-        await api.delete(`${endpoint}/${id}`, config);
-        alert(`Sukses! Data ${type} berhasil dihapus.`);
-      }
-
-      setCrudModal({ ...crudModal, open: false });
-      fetchData(); 
-      
-    } catch (error) {
-      console.error(error);
-      const detailError = error.response?.data?.detail || "Terjadi kesalahan server";
-      alert(`Gagal memproses data: ${detailError}`);
+      alert(`Sukses! Data ${type} berhasil ${action === "delete" ? "dihapus" : action === "edit" ? "diperbarui" : "ditambahkan"}.`);
+      setCrudModal((p) => ({ ...p, open: false }));
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      alert(`Gagal: ${err.response?.data?.detail || "Terjadi kesalahan server"}`);
     }
   };
 
-  const [accords, setAccords] = useState({ basemap: false, wisata: true, halte: true, rute: false });
-  const toggleAccordion = (key) => setAccords((prev) => ({ ...prev, [key]: !prev[key] }));
+  // ─────────────────────────────────────────────────────────────────────────
+  //  RUTE — grouping & toggle
+  // ─────────────────────────────────────────────────────────────────────────
+  const groupedRoutes = useMemo(() => {
+    const groups = { brt: [], angkot: [] };
+    routeGeoJson?.features?.forEach((f) => {
+      const t = getTransType(f.properties?.jenis);
+      if (t === "brt" || t === "angkot") groups[t].push(f);
+    });
+    return groups;
+  }, [routeGeoJson]);
 
-  const colorBrt = "#3b82f6";
-  const colorBus = "#f97316";
-  const colorAngkot = "#10b981";
-
-  // Fungsi Login
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setLoginError("");
-    
-    const formData = new FormData();
-    formData.append('username', e.target["admin-email"].value);
-    formData.append('password', e.target["admin-password"].value);
-
-    try {
-      const response = await api.post("/auth/login", formData);
-      localStorage.setItem("token", response.data.access_token);
-      setIsAdmin(true);
-      closeLogin();
-    } catch (error) {
-      setLoginError("Kredensial tidak valid atau server bermasalah.");
-    }
+  const toggleRoute = (namaRute) => {
+    if (!namaRute) return;
+    setActiveRoutes((p) => ({ ...p, [namaRute.trim()]: !p[namaRute.trim()] }));
   };
 
-  const closeLogin = () => {
-    setShowLogin(false);
-    setLoginError("");
+  const toggleAllRoutesInType = (type, state) => {
+    if (!groupedRoutes[type]) return;
+    const next = { ...activeRoutes };
+    groupedRoutes[type].forEach((f) => {
+      if (f.properties?.nama_rute) next[f.properties.nama_rute.trim()] = state;
+    });
+    setActiveRoutes(next);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsAdmin(false);
-  };
-
-  const handleMapClick = () => {
-    setFocusedRoute(null);
-    setFocusedHalteLatLng(null);
-    setDynamicRadius(BASE_RADIUS);
-  };
-
-  const getNearbyWisata = (halteLatLng, initialRadius = BASE_RADIUS) => {
-    if (!wisataGeoJson?.features || !showWisata) return { nearby: [], radiusUsed: initialRadius };
-
-    const allWisataWithDistance = wisataGeoJson.features
-      .map((feature) => {
-        let centroid = halteLatLng;
-        if (feature.geometry?.type === "Polygon" || feature.geometry?.type === "MultiPolygon") {
-          const coords = feature.geometry.type === "Polygon"
-              ? feature.geometry.coordinates[0]
-              : feature.geometry.coordinates[0][0];
-          let latSum = 0, lngSum = 0;
-          coords.forEach((c) => { lngSum += c[0]; latSum += c[1]; });
-          centroid = L.latLng(latSum / coords.length, lngSum / coords.length);
-        } else if (feature.geometry?.type === "Point") {
-          centroid = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-        }
-        return {
-          ...feature,
-          distance: Math.round(halteLatLng.distanceTo(centroid)),
-        };
-      })
-      .sort((a, b) => a.distance - b.distance);
-
-    if (allWisataWithDistance.length === 0) return { nearby: [], radiusUsed: initialRadius };
-
-    let nearby = allWisataWithDistance.filter((w) => w.distance <= initialRadius);
-    let radiusUsed = initialRadius;
-
-    if (nearby.length === 0) {
-      nearby = [allWisataWithDistance[0]];
-      radiusUsed = allWisataWithDistance[0].distance;
-    }
-    return { nearby, radiusUsed };
-  };
-
+  // ─────────────────────────────────────────────────────────────────────────
+  //  FILTER & STYLE LAYER
+  // ─────────────────────────────────────────────────────────────────────────
   const filterRouteFeatures = (feature) => {
-    const namaRute = feature.properties?.nama_rute;
-    if (!namaRute) return false;
-    return activeRoutes[namaRute.trim()] === true;
+    const nm = feature.properties?.nama_rute;
+    return nm ? activeRoutes[nm.trim()] === true : false;
   };
 
   const filterHalteFeatures = (feature) => {
-    const jenis = String(feature.properties?.jenis || "").toLowerCase();
-    let type = "bus";
-    if (jenis.includes("brt") || jenis.includes("trans")) type = "brt";
-    else if (jenis.includes("angkot")) type = "angkot";
+    const type = getTransType(feature.properties?.jenis);
     return showHalte[type] === true;
   };
 
   const filterWisataFeatures = (feature) => {
     if (!showNearbyWisataOnly) return true;
-    if (!focusedHalteLatLng) return false;
-    let centroid = focusedHalteLatLng;
-    if (feature.geometry?.type === "Polygon" || feature.geometry?.type === "MultiPolygon") {
-      const coords = feature.geometry.type === "Polygon"
-          ? feature.geometry.coordinates[0]
-          : feature.geometry.coordinates[0][0];
-      let latSum = 0, lngSum = 0;
-      coords.forEach((c) => { lngSum += c[0]; latSum += c[1]; });
-      centroid = L.latLng(latSum / coords.length, lngSum / coords.length);
-    } else if (feature.geometry?.type === "Point") {
-      centroid = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-    }
-    const distance = focusedHalteLatLng.distanceTo(centroid);
-    return distance <= dynamicRadius + 50;
+    if (!focusedHalteLatLng)  return false;
+    const centroid = getCentroid(feature);
+    if (!centroid) return false;
+    return focusedHalteLatLng.distanceTo(centroid) <= dynamicRadius + 50;
   };
 
   const getRouteStyle = (feature) => {
-    const jenis = String(feature.properties?.jenis || "").toLowerCase();
-    const nama = feature.properties?.nama_rute;
-    let defaultColor = colorBus;
-    if (jenis.includes("brt") || jenis.includes("trans")) defaultColor = colorBrt;
-    if (jenis.includes("angkot")) defaultColor = colorAngkot;
+    const type  = getTransType(feature.properties?.jenis);
+    const color = COLOR[type];
+    const nama  = feature.properties?.nama_rute;
 
-    let opacity = 0.8;
-    let weight = 5;
+    let opacity = 0.8, weight = 5;
     if (focusedRoute) {
-      if (focusedRoute === nama) { opacity = 1; weight = 8; } 
-      else { opacity = 0.15; weight = 3; }
+      if (focusedRoute === nama) { opacity = 1; weight = 8; }
+      else                       { opacity = 0.15; weight = 3; }
     }
-    return { color: defaultColor, weight: weight, opacity: opacity };
+    // Rute angkot pakai garis putus-putus agar mudah dibedakan
+    const dashArray = type === "angkot" ? "8, 5" : null;
+    return { color, weight, opacity, dashArray };
   };
 
-  const createHalteIcon = (jenisStr, isFocused) => {
-    let cls = "marker-halte";
-    const lowerJenis = String(jenisStr || "").toLowerCase();
-    let defaultColor = colorBus;
+  // ─────────────────────────────────────────────────────────────────────────
+  //  WISATA — kalkulasi terdekat dari halte
+  //  /* Ini fungsi buat nyari tempat wisata terdekat dari titik halte yang lagi di-klik (radius default 3.5km) */
+  // ─────────────────────────────────────────────────────────────────────────
+  const getNearbyWisata = (halteLatLng, initialRadius = BASE_RADIUS) => {
+    if (!wisataGeoJson?.features || !showWisata)
+      return { nearby: [], radiusUsed: initialRadius };
 
-    if (lowerJenis.includes("brt") || lowerJenis.includes("trans")) { cls += " brt"; defaultColor = colorBrt; } 
-    else if (lowerJenis.includes("bus") || lowerJenis.includes("bandros")) { cls += " bus"; defaultColor = colorBus; } 
-    else if (lowerJenis.includes("angkot")) { cls += " angkot"; defaultColor = colorAngkot; } 
-    else cls += " bus";
+    const withDist = wisataGeoJson.features
+      .map((f) => {
+        const c = getCentroid(f);
+        return c ? { ...f, distance: Math.round(halteLatLng.distanceTo(c)) } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.distance - b.distance);
 
-    if (isFocused) cls += " active";
-    const iconHtml = renderToString(
-      <div className={cls} style={{ width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", background: defaultColor, borderRadius: "50%", border: "2px solid white", boxShadow: "0 2px 5px rgba(0,0,0,0.3)" }}>
-        <Bus size={12} color="white" />
-      </div>
-    );
-    return L.divIcon({ html: iconHtml, className: "", iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -12] });
+    if (!withDist.length) return { nearby: [], radiusUsed: initialRadius };
+
+    let nearby = withDist.filter((w) => w.distance <= initialRadius);
+    let radiusUsed = initialRadius;
+    if (!nearby.length) {
+      nearby    = [withDist[0]];
+      radiusUsed = withDist[0].distance;
+    }
+    return { nearby, radiusUsed };
   };
 
-  const formatDistance = (meters) => {
-    if (meters >= 1000) return `${(meters / 1000).toFixed(1)} KM`;
-    return `${(meters / 1000).toFixed(2)} KM`; 
-  };
-
+  // ─────────────────────────────────────────────────────────────────────────
+  //  POPUP & LAYER: HALTE
+  // ─────────────────────────────────────────────────────────────────────────
   const haltePointToLayer = (feature, latlng) => {
-    const jenis = feature.properties?.jenis || "-";
-    const nama = feature.properties?.nama || "Tanpa Nama";
-    const jamMulai = feature.properties?.jam_operasi_mulai || "-";
-    const jamSelesai = feature.properties?.jam_operasi_selesai || "-";
-    const aktif = feature.properties?.aktif !== false ? "Aktif" : "Tidak Aktif";
-    
-    const lowerJenis = String(jenis).toLowerCase();
-    const fallbackImg = lowerJenis.includes("brt") || lowerJenis.includes("trans") ? tmbImg : lowerJenis.includes("angkot") ? angkotImg : bandrosImg;
-    const imgUrl = feature.properties?.gambar_url || fallbackImg;
+    const { jenis = "-", nama = "Tanpa Nama", jam_operasi_mulai: jamMulai = "-",
+            jam_operasi_selesai: jamSelesai = "-" } = feature.properties || {};
+    const aktif   = feature.properties?.aktif !== false;
+    const type    = getTransType(jenis);
+    const color   = COLOR[type];
+    const imgUrl  = feature.properties?.gambar_url ||
+                    (type === "brt" ? tmbImg : type === "angkot" ? angkotImg : bandrosImg);
     const ruteTerkait = feature.properties?.rute_terkait || [];
-    
-    const isFocused = (focusedRoute && ruteTerkait.includes(focusedRoute)) || (focusedHalteLatLng && focusedHalteLatLng.equals(latlng));
+
+    const isFocused =
+      (focusedRoute && ruteTerkait.includes(focusedRoute)) ||
+      (focusedHalteLatLng && focusedHalteLatLng.equals(latlng));
+
     const marker = L.marker(latlng, { icon: createHalteIcon(jenis, isFocused) });
     const { nearby, radiusUsed } = getNearbyWisata(latlng, BASE_RADIUS);
-    const color = lowerJenis.includes("brt") || lowerJenis.includes("trans") ? colorBrt : lowerJenis.includes("angkot") ? colorAngkot : colorBus;
 
-    let radarHtml = "";
-    if (nearby.length > 0) {
-      radarHtml = `
-        <div class="radar-tourism-section">
-          <div class="radar-tourism-title">
-            <span>📍 Wisata Terdekat</span>
-            <span style="font-weight: 500; font-size: 9px; color: #94a3b8;">Max ${(radiusUsed / 1000).toFixed(1)} KM</span>
-          </div>
-          <div class="radar-tourism-list">
-            ${nearby.slice(0, 3).map((w) => `
-              <div class="radar-tourism-item">
-                <span class="radar-tourism-name">${w.properties?.nama_wisata || "Wisata"}</span>
-                <span class="radar-tourism-dist">${formatDistance(w.distance)}</span>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `;
-    }
+    const modaLabel = type === "brt" ? "Trans Metro" : type === "angkot" ? "Angkutan Kota" : "Bandros";
 
-    let adminHtml = "";
-    if (isAdmin) {
-      const id = feature.properties?.id_halte || feature.properties?.id || "unknown";
-      adminHtml = `
-        <div style="display:flex; gap:8px; margin-top:12px; border-top:1px dashed #cbd5e1; padding-top:12px;">
-          <button onclick="window.handleAdminAction('edit', 'halte', '${id}')" style="flex:1; padding:6px; background:#f59e0b; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600;">✏️ Edit</button>
-          <button onclick="window.handleAdminAction('delete', 'halte', '${id}')" style="flex:1; padding:6px; background:#ef4444; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600;">🗑️ Hapus</button>
-        </div>
-      `;
-    }
+    const radarHtml = nearby.length
+      ? `<div class="radar-tourism-section">
+           <div class="radar-tourism-title">
+             <span>📍 Wisata Terdekat</span>
+             <span style="font-weight:500;font-size:9px;color:#94a3b8">Max ${(radiusUsed/1000).toFixed(1)} km</span>
+           </div>
+           <div class="radar-tourism-list">
+             ${nearby.slice(0, 3).map((w) =>
+               `<div class="radar-tourism-item">
+                 <span class="radar-tourism-name">${getWisataIcon(w.properties?.nama_wisata||"")} ${w.properties?.nama_wisata || "Wisata"}</span>
+                 <span class="radar-tourism-dist">${formatDist(w.distance)}</span>
+               </div>`
+             ).join("")}
+           </div>
+         </div>`
+      : "";
 
+    const adminHtml = isAdmin
+      ? (() => {
+          const id = feature.properties?.id_halte || feature.properties?.id || "unknown";
+          return `<div style="display:flex;gap:8px;margin-top:12px;border-top:1px dashed #cbd5e1;padding-top:12px;">
+            <button onclick="window.handleAdminAction('edit','halte','${id}')" style="flex:1;padding:6px;background:#f59e0b;color:white;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">✏️ Edit</button>
+            <button onclick="window.handleAdminAction('delete','halte','${id}')" style="flex:1;padding:6px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🗑️ Hapus</button>
+          </div>`;
+        })()
+      : "";
+
+    const typeIcon = type === "brt" ? "🚌" : type === "angkot" ? "🚐" : "🚎";
     const popupContent = `
       <div class="premium-halte-popup">
         <div class="premium-popup-header">
-          <img src="${imgUrl}" alt="${nama}" class="premium-popup-img" />
+          <img src="${imgUrl}" alt="${nama}" class="premium-popup-img"/>
           <div class="premium-popup-gradient"></div>
+          <div class="halte-type-badge" style="background:${color};">${typeIcon} ${modaLabel}</div>
         </div>
         <div class="premium-popup-body">
           <div class="premium-popup-title-row">
             <h3 class="premium-popup-name">${nama}</h3>
-            <span class="premium-popup-status ${aktif === "Aktif" ? "status-aktif" : "status-nonaktif"}">${aktif}</span>
+            <span class="premium-popup-status ${aktif ? "status-aktif" : "status-nonaktif"}">${aktif ? "Aktif" : "Tidak Aktif"}</span>
           </div>
           <div class="premium-popup-meta">
             <div class="meta-row">
-              <span class="meta-label">🚍 Moda</span>
-              <span class="badge-moda" style="background: ${color};">${jenis}</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-label">🕒 Operasi</span>
-              <strong style="color: #334155;">${jamMulai} - ${jamSelesai}</strong>
+              <span class="meta-label">🕒 Jam Operasi</span>
+              <strong style="color:#334155">${jamMulai} – ${jamSelesai}</strong>
             </div>
           </div>
           ${radarHtml}
           ${adminHtml}
         </div>
-      </div>
-    `;
+      </div>`;
 
     marker.bindPopup(popupContent, { minWidth: 280, maxWidth: 320, offset: [0, -12] });
     marker.on("click", (e) => {
@@ -499,45 +637,47 @@ function MapView() {
     return marker;
   };
 
+  // ─────────────────────────────────────────────────────────────────────────
+  //  POPUP & LAYER: RUTE
+  // ─────────────────────────────────────────────────────────────────────────
   const onEachRouteFeature = (feature, layer) => {
-    const nama = feature.properties?.nama_rute || "Trayek Tanpa Nama";
-    const kode = feature.properties?.kode_rute || "-";
+    const nama  = feature.properties?.nama_rute || "Trayek Tanpa Nama";
+    const kode  = feature.properties?.kode_rute || "-";
     const jenis = feature.properties?.jenis || "-";
-    const lowerJenis = String(jenis).toLowerCase();
-    const color = lowerJenis.includes("brt") || lowerJenis.includes("trans") ? colorBrt : lowerJenis.includes("angkot") ? colorAngkot : colorBus;
+    const type  = getTransType(jenis);
+    const color = COLOR[type];
 
-    let adminHtml = "";
-    if (isAdmin) {
-      const id = feature.properties?.id_rute || feature.properties?.id || "unknown";
-      adminHtml = `
-        <div style="display:flex; gap:8px; margin-top:12px; border-top:1px dashed #cbd5e1; padding-top:12px;">
-          <button onclick="window.handleAdminAction('edit', 'rute', '${id}')" style="flex:1; padding:6px; background:#f59e0b; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600;">✏️ Edit</button>
-          <button onclick="window.handleAdminAction('delete', 'rute', '${id}')" style="flex:1; padding:6px; background:#ef4444; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600;">🗑️ Hapus</button>
-        </div>
-      `;
-    }
+    const adminHtml = isAdmin
+      ? (() => {
+          const id = feature.properties?.id_rute || feature.properties?.id || "unknown";
+          return `<div style="display:flex;gap:8px;margin-top:12px;border-top:1px dashed #cbd5e1;padding-top:12px;">
+            <button onclick="window.handleAdminAction('edit','rute','${id}')" style="flex:1;padding:6px;background:#f59e0b;color:white;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">✏️ Edit</button>
+            <button onclick="window.handleAdminAction('delete','rute','${id}')" style="flex:1;padding:6px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🗑️ Hapus</button>
+          </div>`;
+        })()
+      : "";
 
+    const typeIcon = type === "brt" ? "🚌" : type === "angkot" ? "🚐" : "🚎";
     const popupContent = `
-      <div class="smart-hud-popup" style="font-family: 'Inter', sans-serif; color: #334155; min-width: 200px; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05);">
-        <h4 style="margin: 0 0 10px 0; color: ${color}; font-size: 14px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
-          <span>🚌 ${nama}</span>
-          <span style="font-size: 10px; font-weight: 600; background: ${color}20; color: ${color}; padding: 3px 6px; border-radius: 4px;">${jenis}</span>
+      <div style="font-family:'Inter',sans-serif;color:#334155;min-width:220px;padding:14px;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.05);">
+        <h4 style="margin:0 0 10px 0;color:${color};font-size:14px;border-bottom:1px solid rgba(0,0,0,0.05);padding-bottom:8px;font-weight:700;display:flex;justify-content:space-between;align-items:center;">
+          <span>${typeIcon} ${nama}</span>
+          <span style="font-size:10px;font-weight:600;background:${color}20;color:${color};padding:3px 6px;border-radius:4px;">${jenis}</span>
         </h4>
-        <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px; color: #64748b;">
-          <div style="display:flex; justify-content:space-between;">
-            <span>Kode Trayek:</span> 
-            <strong style="color: #1e293b;">${kode}</strong>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;color:#64748b;">
+          <div style="display:flex;justify-content:space-between;">
+            <span>Kode Trayek:</span>
+            <strong style="color:#1e293b;">${kode}</strong>
           </div>
           ${adminHtml}
         </div>
-      </div>
-    `;
+      </div>`;
 
     layer.bindPopup(popupContent, { maxWidth: 300 });
     layer.on({
       mouseover: (e) => { if (!focusedRoute) e.target.setStyle({ weight: 8, opacity: 1 }); },
-      mouseout: (e) => { if (!focusedRoute) e.target.setStyle({ weight: 5, opacity: 0.8 }); },
-      click: (e) => {
+      mouseout:  (e) => { if (!focusedRoute) e.target.setStyle({ weight: 5, opacity: 0.8 }); },
+      click:     (e) => {
         L.DomEvent.stopPropagation(e);
         setFocusedRoute((prev) => (prev === nama ? null : nama));
       },
@@ -545,265 +685,336 @@ function MapView() {
 
     if (focusedRoute === nama) {
       setTimeout(() => {
-        if (layer && layer._map) {
-          if (layer.getBounds) layer.openPopup(layer.getBounds().getCenter());
-          else layer.openPopup();
+        if (layer?._map) {
+          layer.getBounds ? layer.openPopup(layer.getBounds().getCenter()) : layer.openPopup();
         }
       }, 250);
     }
   };
 
+  // ─────────────────────────────────────────────────────────────────────────
+  //  POPUP & LAYER: WISATA
+  //  /* Ini yang ngatur pop up kalo pin wisata di klik, nampilin info nama, deskripsi dan tombol edit kalo admin */
+  // ─────────────────────────────────────────────────────────────────────────
   const onEachWisataFeature = (feature, layer) => {
-    const nama = feature.properties?.nama_wisata || "Objek Wisata";
-    const kode = feature.properties?.kode_wisata || "-";
+    const nama      = feature.properties?.nama_wisata || "Objek Wisata";
+    const kode      = feature.properties?.kode_wisata || "-";
     const deskripsi = feature.properties?.deskripsi || "-";
+    const emoji     = getWisataIcon(nama, deskripsi);
 
-    let adminHtml = "";
-    if (isAdmin) {
-      const id = feature.properties?.id_wisata || feature.properties?.id || "unknown";
-      adminHtml = `
-        <div style="display:flex; gap:8px; margin-top:12px; border-top:1px dashed #cbd5e1; padding-top:12px;">
-          <button onclick="window.handleAdminAction('edit', 'wisata', '${id}')" style="flex:1; padding:6px; background:#f59e0b; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600;">✏️ Edit</button>
-          <button onclick="window.handleAdminAction('delete', 'wisata', '${id}')" style="flex:1; padding:6px; background:#ef4444; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600;">🗑️ Hapus</button>
-        </div>
-      `;
-    }
+    const adminHtml = isAdmin
+      ? (() => {
+          const id = feature.properties?.id_wisata || feature.properties?.id || "unknown";
+          return `<div style="display:flex;gap:8px;margin-top:12px;border-top:1px dashed #cbd5e1;padding-top:12px;">
+            <button onclick="window.handleAdminAction('edit','wisata','${id}')" style="flex:1;padding:6px;background:#f59e0b;color:white;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">✏️ Edit</button>
+            <button onclick="window.handleAdminAction('delete','wisata','${id}')" style="flex:1;padding:6px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;">🗑️ Hapus</button>
+          </div>`;
+        })()
+      : "";
 
     const popupContent = `
-      <div class="smart-hud-popup" style="font-family: 'Inter', sans-serif; color: #334155; max-width: 260px; background: white; border-radius: 12px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05);">
-        <div class="hud-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 6px; margin-bottom: 6px;">
-          <div class="hud-title" style="font-weight: 700; font-size: 14px; color: #f43f5e;">🏛️ ${nama}</div>
-          <div class="hud-badge" style="background: rgba(244,63,94,0.1); color: #f43f5e; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold;">WISATA</div>
-        </div>
-        <div class="hud-body" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: #64748b;">
-          <div style="display:flex; justify-content:space-between;"><span>Kode Wisata:</span> <strong style="color: #1e293b;">${kode}</strong></div>
-          <div style="margin-top: 6px; line-height: 1.4; color: #64748b; border-top: 1px dashed rgba(0,0,0,0.05); padding-top: 6px; text-align: justify;">
-            <strong>Deskripsi:</strong><br/> ${deskripsi}
+      <div style="font-family:'Inter',sans-serif;color:#334155;width:280px;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.05);">
+        <div style="background:linear-gradient(135deg,#f43f5e,#e11d48);padding:16px;color:white;display:flex;align-items:center;gap:12px;">
+          <div style="font-size:32px;background:rgba(255,255,255,0.2);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${emoji}</div>
+          <div>
+            <div style="font-weight:700;font-size:15px;line-height:1.3;margin-bottom:4px;">${nama}</div>
+            <div style="font-size:11px;opacity:0.9;display:flex;align-items:center;gap:4px;">
+              <span style="background:rgba(0,0,0,0.2);padding:2px 6px;border-radius:4px;">📍 ${kode}</span>
+            </div>
           </div>
-          ${adminHtml}
         </div>
-      </div>
-    `;
-    layer.bindPopup(popupContent, { maxWidth: 300 });
+        <div style="padding:14px;font-size:12px;color:#475569;line-height:1.6;border-bottom:1px solid #f1f5f9;text-align:justify;">
+          ${deskripsi !== "-"
+            ? deskripsi.slice(0, 180) + (deskripsi.length > 180 ? "..." : "")
+            : "<em>Deskripsi belum tersedia.</em>"}
+        </div>
+        ${adminHtml
+          ? `<div style="padding:0 12px 12px;">${adminHtml}</div>`
+          : ""}
+      </div>`;
+
+    layer.bindPopup(popupContent, { minWidth: 280, maxWidth: 320 });
     layer.on({
-      mouseover: (e) => { e.target.setStyle({ fillOpacity: 0.8, weight: 2, color: "#f43f5e" }); },
-      mouseout: (e) => { e.target.setStyle({ fillOpacity: 0.4, weight: 1, color: "transparent" }); },
-      click: (e) => {
+      mouseover: (e) => e.target.setStyle({ fillOpacity: 0.75, weight: 2, color: COLOR.wisata }),
+      mouseout:  (e) => e.target.setStyle({ fillOpacity: 0.3,  weight: 1.5, color: `${COLOR.wisata}88` }),
+      click:     (e) => {
         L.DomEvent.stopPropagation(e);
-        let latlng;
-        if (feature.geometry.type === "Polygon") {
-          const coords = feature.geometry.coordinates[0];
-          let latSum = 0, lngSum = 0;
-          coords.forEach((c) => { lngSum += c[0]; latSum += c[1]; });
-          latlng = L.latLng(latSum / coords.length, lngSum / coords.length);
-        }
-        if (latlng) setFlyTarget({ latlng, zoom: 16 });
+        const centroid = getCentroid(feature);
+        if (centroid) setFlyTarget({ latlng: centroid, zoom: 16 });
       },
     });
   };
 
-  const groupedRoutes = { brt: [], angkot: [] };
-  if (routeGeoJson && routeGeoJson.features) {
-    routeGeoJson.features.forEach((f) => {
-      const type = String(f.properties?.jenis || "").toLowerCase();
-      if (type.includes("brt") || type.includes("trans")) groupedRoutes.brt.push(f);
-      else if (type.includes("angkot")) groupedRoutes.angkot.push(f);
-    });
-  }
-
-  const toggleRoute = (namaRute) => {
-    if (!namaRute) return;
-    setActiveRoutes((prev) => ({ ...prev, [namaRute.trim()]: !prev[namaRute.trim()] }));
+  // ─────────────────────────────────────────────────────────────────────────
+  //  LOGIKA AUTH
+  // ─────────────────────────────────────────────────────────────────────────
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    const fd = new FormData();
+    fd.append("username", e.target["admin-email"].value);
+    fd.append("password", e.target["admin-password"].value);
+    try {
+      const res = await api.post("/auth/login", fd);
+      localStorage.setItem("token", res.data.access_token);
+      setIsAdmin(true);
+      closeLogin();
+    } catch {
+      setLoginError("Kredensial tidak valid atau server bermasalah.");
+    }
   };
 
-  const toggleAllRoutesInType = (type, state) => {
-    if (!groupedRoutes[type]) return;
-    const newActive = { ...activeRoutes };
-    groupedRoutes[type].forEach((f) => {
-      if (f.properties?.nama_rute) newActive[f.properties.nama_rute.trim()] = state;
-    });
-    setActiveRoutes(newActive);
+  const closeLogin = () => { setShowLogin(false); setLoginError(""); };
+  const handleLogout = () => { localStorage.removeItem("token"); setIsAdmin(false); };
+
+  const handleMapClick = () => {
+    setFocusedRoute(null);
+    setFocusedHalteLatLng(null);
+    setDynamicRadius(BASE_RADIUS);
   };
 
+  // ─────────────────────────────────────────────────────────────────────────
+  //  TILE URL
+  // ─────────────────────────────────────────────────────────────────────────
   const getTileUrl = () => {
-    if (layerType === "satellite") return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-    if (layerType === "dark") return "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    if (layerType === "satellite")
+      return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+    if (layerType === "dark")
+      return "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
     return "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
   };
 
+  // ─────────────────────────────────────────────────────────────────────────
+  //  RENDER
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className={`map-page-wrapper ${isPreview ? "is-preview-mode" : ""}`}>
+
+      {/* ══════════════════════════════════════════════════════════
+          SIDEBAR KIRI
+      ══════════════════════════════════════════════════════════ */}
       {!isPreview && (
         <aside className={`map-sidebar-premium ${openModal ? "open" : ""}`}>
-        <div className="sidebar-header-top">
-          <Link to="/home" className="sidebar-back-link">
-            <ArrowLeft size={15} /> Kembali
-          </Link>
-          <div className="sidebar-brand">
-            <div>
+          <div className="sidebar-header-top">
+            <Link to="/home" className="sidebar-back-link">
+              <ArrowLeft size={15} /> Kembali
+            </Link>
+            <div className="sidebar-brand">
               <div className="sidebar-brand-name">Kabandung Heula</div>
               <div className="sidebar-brand-sub">Peta Interaktif</div>
             </div>
-          </div>
-          <button className="sidebar-close-mobile" onClick={() => setOpenModal(false)}>
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="sidebar-scrollable">
-          {/* ACCORDION: BASEMAP */}
-          <div>
-            <div className="accordion-header" onClick={() => toggleAccordion("basemap")}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <MapIcon size={16} color="var(--color-primary)" /> Pilihan Peta
-              </div>
-              {accords.basemap ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </div>
-            <div className={`accordion-body ${accords.basemap ? "open" : ""}`}>
-              <div className="basemap-toggle-group">
-                <button onClick={() => setLayerType("default")} className={`basemap-btn ${layerType === "default" ? "active" : ""}`}>
-                  <MapIcon size={16} /> Standard
-                </button>
-                <button onClick={() => setLayerType("dark")} className={`basemap-btn ${layerType === "dark" ? "active" : ""}`}>
-                  <Moon size={16} /> Dark
-                </button>
-                <button onClick={() => setLayerType("satellite")} className={`basemap-btn ${layerType === "satellite" ? "active" : ""}`}>
-                  <Layers size={16} /> Satellite
-                </button>
-              </div>
-            </div>
+            <button className="sidebar-close-mobile" onClick={() => setOpenModal(false)}>
+              <X size={16} />
+            </button>
           </div>
 
-          {/* ACCORDION: TRANSPORTASI */}
-          <div>
-            <div className="accordion-header" onClick={() => toggleAccordion("halte")}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <Bus size={16} color={colorBrt} /> Filter Transportasi
+          <div className="sidebar-scrollable">
+
+            {/* ── ACCORDION: BASEMAP ── */}
+            <div>
+              <div className="accordion-header" onClick={() => toggleAccordion("basemap")}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <MapIcon size={16} color="var(--color-primary)" /> Pilihan Peta
+                </div>
+                {accords.basemap ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </div>
-              {accords.halte ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              <div className={`accordion-body ${accords.basemap ? "open" : ""}`}>
+                <div className="basemap-toggle-group">
+                  {[
+                    { key: "default",   label: "Standard",  icon: <MapIcon size={16} /> },
+                    { key: "dark",      label: "Dark",      icon: <Moon size={16} /> },
+                    { key: "satellite", label: "Satellite", icon: <Layers size={16} /> },
+                  ].map(({ key, label, icon }) => (
+                    <button
+                      key={key}
+                      onClick={() => setLayerType(key)}
+                      className={`basemap-btn ${layerType === key ? "active" : ""}`}
+                    >
+                      {icon} {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className={`accordion-body ${accords.halte ? "open" : ""}`}>
-              <h3 className="sidebar-section-title" style={{ marginTop: "8px" }}>
-                Stasiun & Halte
-              </h3>
-              <div className="sidebar-card halte-card-group">
-                {["brt", "bus", "angkot"].map((type, idx) => (
-                  <div key={type} className="halte-card-item" style={{ borderBottom: idx < 2 ? "1px solid rgba(0,0,0,0.05)" : "none" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: type === "brt" ? colorBrt : type === "bus" ? colorBus : colorAngkot }}></div>
-                      <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>
-                        {type === "brt" ? "Trans Metro" : type === "bus" ? "Bandros" : "Angkutan Kota"}
-                      </span>
-                    </div>
-                    <CustomToggle
-                      checked={showHalte[type]}
-                      onChange={() => setShowHalte({ ...showHalte, [type]: !showHalte[type] })}
-                      color={type === "brt" ? colorBrt : type === "bus" ? colorBus : colorAngkot}
-                    />
-                  </div>
-                ))}
+
+            {/* ── ACCORDION: TRANSPORTASI ── */}
+            <div>
+              <div className="accordion-header" onClick={() => toggleAccordion("halte")}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Bus size={16} color={COLOR.brt} /> Filter Transportasi
+                </div>
+                {accords.halte ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </div>
-
-              <h3 className="sidebar-section-title" style={{ marginTop: "16px" }}>
-                Lintasan Rute
-              </h3>
-              {["brt", "angkot"].map((type) => {
-                const title = type === "brt" ? "Trans Metro Bandung" : "Angkutan Kota";
-                const color = type === "brt" ? colorBrt : colorAngkot;
-                const isAllActive = groupedRoutes[type]?.length > 0 && groupedRoutes[type].every((r) => activeRoutes[r.properties?.nama_rute?.trim()]);
-
-                return (
-                  <div key={type} className="sidebar-card rute-card-group">
-                    <div className="rute-card-header">
+              <div className={`accordion-body ${accords.halte ? "open" : ""}`}>
+                <h3 className="sidebar-section-title" style={{ marginTop: "8px" }}>
+                  Stasiun & Halte
+                </h3>
+                <div className="sidebar-card halte-card-group">
+                  {[
+                    { type: "brt",    label: "Trans Metro",   emoji: "🚌" },
+                    { type: "bus",    label: "Bandros",       emoji: "🚎" },
+                    { type: "angkot",label: "Angkutan Kota",  emoji: "🚐" },
+                  ].map(({ type, label, emoji }, idx) => (
+                    <div
+                      key={type}
+                      className="halte-card-item"
+                      style={{ borderBottom: idx < 2 ? "1px solid rgba(0,0,0,0.05)" : "none" }}
+                    >
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <CustomToggle checked={isAllActive} onChange={() => toggleAllRoutesInType(type, !isAllActive)} color={color} />
-                        <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>{title}</span>
+                        <div
+                          className="halte-dot-icon"
+                          style={{ background: COLOR[type] }}
+                        >
+                          {emoji}
+                        </div>
+                        <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>
+                          {label}
+                        </span>
                       </div>
+                      <CustomToggle
+                        checked={showHalte[type]}
+                        onChange={() => setShowHalte({ ...showHalte, [type]: !showHalte[type] })}
+                        color={COLOR[type]}
+                      />
                     </div>
-                    <div className="rute-card-body">
-                      {groupedRoutes[type]?.map((route, idx) => {
-                        const name = route.properties?.nama_rute?.trim();
-                        const isActive = activeRoutes[name];
-                        return (
-                          <div key={idx} onClick={() => toggleRoute(name)} className="route-item-modern" style={{ display: "flex", alignItems: "flex-start", padding: "8px 0", cursor: "pointer" }}>
-                            <div style={{ marginTop: "2px" }}>
-                              {isActive ? <CheckSquare size={16} color={color} /> : <Square size={16} color="#94a3b8" />}
-                            </div>
-                            <span style={{ color: isActive ? "#334155" : "#64748b", marginLeft: "10px", fontSize: "12px", fontWeight: isActive ? "600" : "400" }}>
-                              {name}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ACCORDION: PARIWISATA */}
-          <div>
-            <div className="accordion-header" onClick={() => toggleAccordion("wisata")}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <MapPin size={16} color="#f43f5e" /> Filter Wisata
-              </div>
-              {accords.wisata ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </div>
-            <div className={`accordion-body ${accords.wisata ? "open" : ""}`}>
-              <div className="sidebar-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>Kawasan Wisata</span>
-                  <CustomToggle
-                    checked={showWisata}
-                    onChange={() => {
-                      setShowWisata(!showWisata);
-                      if (showWisata) setShowNearbyWisataOnly(false);
-                    }}
-                    color="#f43f5e"
-                  />
+                  ))}
                 </div>
 
-                {showWisata && (
-                  <div style={{ marginTop: "16px", padding: "12px 10px", background: "#f8fafc", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "11px", fontWeight: "600", color: "#64748b" }}>
-                      <span>Radius Jangkauan</span>
-                      <span>{(dynamicRadius / 1000).toFixed(1)} KM</span>
-                    </div>
-                    <input 
-                      type="range" min="1000" max="5000" step="500" value={dynamicRadius}
-                      onChange={(e) => setDynamicRadius(Number(e.target.value))}
-                      style={{ width: "100%", accentColor: "#f43f5e" }}
-                    />
-                    
-                    <div onClick={() => setShowNearbyWisataOnly(!showNearbyWisataOnly)} className="route-item-modern" style={{ display: "flex", alignItems: "flex-start", padding: "8px 0", marginTop: "8px", cursor: "pointer" }}>
-                      <div style={{ marginTop: "2px" }}>
-                        {showNearbyWisataOnly ? <CheckSquare size={16} color="#f43f5e" /> : <Square size={16} color="#94a3b8" />}
-                      </div>
-                      <span style={{ color: showNearbyWisataOnly ? "#334155" : "#64748b", marginLeft: "10px", fontSize: "11px", fontWeight: showNearbyWisataOnly ? "600" : "400", lineHeight: "1.4" }}>
-                        Hanya wisata di dalam radius
-                      </span>
-                    </div>
+                <h3 className="sidebar-section-title" style={{ marginTop: "16px" }}>
+                  Lintasan Rute
+                </h3>
+                {["brt", "angkot"].map((type) => {
+                  const title      = type === "brt" ? "Trans Metro Bandung" : "Angkutan Kota";
+                  const color      = COLOR[type];
+                  const isAllActive =
+                    groupedRoutes[type]?.length > 0 &&
+                    groupedRoutes[type].every((r) => activeRoutes[r.properties?.nama_rute?.trim()]);
 
-                    {showNearbyWisataOnly && !focusedHalteLatLng && (
-                      <div style={{ padding: "8px 10px", background: "rgba(244, 63, 94, 0.05)", color: "#e11d48", fontSize: "11px", borderRadius: "6px", border: "1px solid rgba(244, 63, 94, 0.2)", marginTop: "8px", lineHeight: "1.4" }}>
-                        <Info size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px", position: "relative", top: "-1px" }} />
-                        Klik halte di peta untuk melihat objek wisata terdekat.
+                  return (
+                    <div key={type} className="sidebar-card rute-card-group">
+                      <div className="rute-card-header">
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          <CustomToggle
+                            checked={isAllActive}
+                            onChange={() => toggleAllRoutesInType(type, !isAllActive)}
+                            color={color}
+                          />
+                          <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>{title}</span>
+                        </div>
+                        {/* Indikator gaya garis rute */}
+                        <div className="route-line-preview" style={{
+                          borderTop: type === "angkot" ? `3px dashed ${color}` : `3px solid ${color}`,
+                          width: "32px",
+                        }} />
                       </div>
-                    )}
-                  </div>
-                )}
+                      <div className="rute-card-body">
+                        {groupedRoutes[type]?.map((route, idx) => {
+                          const name     = route.properties?.nama_rute?.trim();
+                          const isActive = activeRoutes[name];
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => toggleRoute(name)}
+                              className="route-item-modern"
+                            >
+                              <div style={{ marginTop: "2px" }}>
+                                {isActive
+                                  ? <CheckSquare size={16} color={color} />
+                                  : <Square size={16} color="#94a3b8" />}
+                              </div>
+                              <span style={{
+                                color: isActive ? "#334155" : "#64748b",
+                                marginLeft: "10px",
+                                fontSize: "12px",
+                                fontWeight: isActive ? "600" : "400",
+                              }}>
+                                {name}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
 
-          <div style={{ height: "40px" }}></div>
-        </div>
-      </aside>
+            {/* ── ACCORDION: PARIWISATA ── */}
+            <div>
+              <div className="accordion-header" onClick={() => toggleAccordion("wisata")}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <MapPin size={16} color={COLOR.wisata} /> Filter Wisata
+                </div>
+                {accords.wisata ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </div>
+              <div className={`accordion-body ${accords.wisata ? "open" : ""}`}>
+                <div className="sidebar-card">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ color: "#334155", fontSize: "13px", fontWeight: "600" }}>
+                      Kawasan Wisata
+                    </span>
+                    <CustomToggle
+                      checked={showWisata}
+                      onChange={() => { setShowWisata(!showWisata); if (showWisata) setShowNearbyWisataOnly(false); }}
+                      color={COLOR.wisata}
+                    />
+                  </div>
+
+                  {showWisata && (
+                    <div style={{ marginTop: "16px", padding: "12px 10px", background: "#f8fafc", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "11px", fontWeight: "600", color: "#64748b" }}>
+                        <span>Radius Jangkauan</span>
+                        <span>{(dynamicRadius / 1000).toFixed(1)} km</span>
+                      </div>
+                      <input
+                        type="range" min="1000" max="5000" step="500" value={dynamicRadius}
+                        onChange={(e) => setDynamicRadius(Number(e.target.value))}
+                        style={{ width: "100%", accentColor: COLOR.wisata }}
+                      />
+                      <div
+                        onClick={() => setShowNearbyWisataOnly(!showNearbyWisataOnly)}
+                        className="route-item-modern"
+                        style={{ padding: "8px 0", marginTop: "8px", cursor: "pointer" }}
+                      >
+                        <div style={{ marginTop: "2px" }}>
+                          {showNearbyWisataOnly
+                            ? <CheckSquare size={16} color={COLOR.wisata} />
+                            : <Square size={16} color="#94a3b8" />}
+                        </div>
+                        <span style={{
+                          color: showNearbyWisataOnly ? "#334155" : "#64748b",
+                          marginLeft: "10px", fontSize: "11px",
+                          fontWeight: showNearbyWisataOnly ? "600" : "400",
+                          lineHeight: "1.4",
+                        }}>
+                          Hanya wisata di dalam radius
+                        </span>
+                      </div>
+
+                      {showNearbyWisataOnly && !focusedHalteLatLng && (
+                        <div style={{ padding: "8px 10px", background: "rgba(244,63,94,0.05)", color: "#e11d48", fontSize: "11px", borderRadius: "6px", border: "1px solid rgba(244,63,94,0.2)", marginTop: "8px", lineHeight: "1.4" }}>
+                          <Info size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
+                          Klik halte di peta untuk melihat wisata terdekat.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: "40px" }} />
+          </div>
+        </aside>
       )}
 
+      {/* ══════════════════════════════════════════════════════════
+          AREA PETA KANAN
+      ══════════════════════════════════════════════════════════ */}
       <main className="map-container-main">
-        {/* HUD/TOP BAR untuk Mobile & Admin Status */}
+
+        {/* TOP BAR */}
         {!isPreview && (
           <div className="map-top-bar">
             <button className="sidebar-toggle-btn" onClick={() => setOpenModal(true)}>
@@ -812,71 +1023,144 @@ function MapView() {
 
             <div className="map-smart-hud">
               <div className="hud-stat">
-                <MapPin size={14} color={colorBrt} /> <strong>Halte</strong>
+                <MapPin size={14} color={COLOR.brt} /> <strong>Halte</strong>
               </div>
-              <div className="hud-divider"></div>
+              <div className="hud-divider" />
               <div className="hud-stat">
-                <Bus size={14} color={colorBus} /> <strong>Rute</strong>
+                <Bus size={14} color={COLOR.bus} /> <strong>Rute</strong>
               </div>
-              <div className="hud-divider"></div>
+              <div className="hud-divider" />
               <div className="hud-stat">
-                <Activity size={14} color="#f43f5e" /> <strong>Wisata</strong>
+                <Activity size={14} color={COLOR.wisata} /> <strong>Wisata</strong>
               </div>
               {(focusedRoute || focusedHalteLatLng) && (
                 <>
-                  <div className="hud-divider"></div>
+                  <div className="hud-divider" />
                   <button className="hud-reset-btn" onClick={handleMapClick}>
-                    Reset Fokus
+                    ✕ Reset Fokus
                   </button>
                 </>
               )}
-
-              {/* INDIKATOR ADMIN / TOMBOL LOGIN */}
-              <div className="hud-divider"></div>
+              <div className="hud-divider" />
               {isAdmin ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ background: '#10b981', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>
-                    ✓ Mode Admin
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "0 8px" }}>
+                  <span style={{ background: "#10b981", color: "white", padding: "4px 8px", borderRadius: "4px", fontSize: "11px", fontWeight: "bold" }}>
+                    ✓ Admin
                   </span>
-                  <button onClick={handleLogout} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '600' }}>
+                  <button onClick={handleLogout} style={{ background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: "600" }}>
                     <LogOut size={14} /> Keluar
                   </button>
                 </div>
               ) : (
-                <button onClick={() => setShowLogin(true)} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '600' }}>
+                <button onClick={() => setShowLogin(true)} style={{ background: "#3b82f6", color: "white", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: "600", margin: "0 4px" }}>
                   <Lock size={14} /> Login Admin
                 </button>
               )}
-
             </div>
           </div>
         )}
 
-        {/* FLOATING UI OVERLAY */}
+        {/* FLOATING UI: SEARCH + LEGEND */}
         {!isPreview && (
           <div className="floating-ui-container">
-            <div className="floating-search-bar">
-              <Search size={18} color="#9ca3af" />
-              <input type="text" className="floating-search-input" placeholder="Cari halte, rute, atau wisata..." />
+
+            {/* ── SEARCH BAR ── */}
+            <div className="floating-search-wrapper" ref={searchRef}>
+              <div className="floating-search-bar">
+                <Search size={18} color="#9ca3af" />
+                <input
+                  type="text"
+                  className="floating-search-input"
+                  placeholder="Cari halte, rute, atau wisata..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+                />
+                {searchQuery && (
+                  <button
+                    className="search-clear-btn"
+                    onClick={() => { setSearchQuery(""); setShowDropdown(false); }}
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
+
+              {/* Dropdown hasil pencarian */}
+              {showDropdown && searchResults.length > 0 && (
+                <div className="search-dropdown">
+                  {searchResults.map((item, i) => {
+                    const typeColor =
+                      item.type === "rute"   ? COLOR[getTransType(item.sublabel)]
+                      : item.type === "halte" ? COLOR[getTransType(item.sublabel)]
+                      : COLOR.wisata;
+                    const typeIcon =
+                      item.type === "wisata" ? "🏛️"
+                      : item.type === "rute"  ? "🛣️"
+                      : "🚏";
+                    return (
+                      <div
+                        key={i}
+                        className="search-result-item"
+                        onClick={() => handleSearchSelect(item)}
+                      >
+                        <div className="search-result-icon" style={{ background: `${typeColor}20`, color: typeColor }}>
+                          {typeIcon}
+                        </div>
+                        <div className="search-result-text">
+                          <div className="search-result-label">{item.label}</div>
+                          <div className="search-result-sub">{item.sublabel}</div>
+                        </div>
+                        <ChevronRight size={14} color="#94a3b8" />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            <div className="floating-legend">
-              <span style={{ color: "#1f2937" }}>Legenda</span>
-              <div className="legend-item"><div className="legend-color" style={{ background: colorBrt }}></div> Trans Metro</div>
-              <div className="legend-item"><div className="legend-color" style={{ background: colorBus }}></div> Bandros</div>
-              <div className="legend-item"><div className="legend-color" style={{ background: colorAngkot }}></div> Angkot</div>
-              <div className="legend-item"><div className="legend-color" style={{ background: "#64748b" }}></div> Halte</div>
-              <div className="legend-item"><MapPin size={14} color="#f43f5e" /> Wisata</div>
+            {/* ── LEGENDA (Horizontal di Tengah Bawah) ── */}
+            <div className="floating-legend-horizontal">
+              <div className="legend-item-pill">
+                <div className="legend-icon-wrap" style={{ borderColor: COLOR.brt }}><div className="legend-dot" style={{ background: COLOR.brt }}>🚌</div></div>
+                <span>Halte Trans</span>
+              </div>
+              <div className="legend-item-pill">
+                <div className="legend-icon-wrap" style={{ borderColor: COLOR.bus }}><div className="legend-dot" style={{ background: COLOR.bus }}>🚎</div></div>
+                <span>Bandros</span>
+              </div>
+              <div className="legend-item-pill">
+                <div className="legend-icon-wrap" style={{ borderColor: COLOR.angkot }}><div className="legend-dot" style={{ background: COLOR.angkot }}>🚐</div></div>
+                <span>Halte Angkot</span>
+              </div>
+
+              <div className="legend-divider" />
+
+              <div className="legend-item-pill">
+                <div className="legend-line" style={{ borderColor: COLOR.brt, borderStyle: "solid" }} />
+                <span>Rute Trans</span>
+              </div>
+              <div className="legend-item-pill">
+                <div className="legend-line" style={{ borderColor: COLOR.angkot, borderStyle: "dashed" }} />
+                <span>Rute Angkot</span>
+              </div>
+
+              <div className="legend-divider" />
+
+              <div className="legend-item-pill">
+                <div className="wisata-legend-icon"><div className="wisata-legend-inner">📸</div></div>
+                <span>Wisata</span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* TOMBOL TAMBAH DATA (HANYA ADMIN) */}
+        {/* TOMBOL TAMBAH DATA (ADMIN) */}
         {isAdmin && !isPreview && (
-          <div style={{ position: 'absolute', bottom: '30px', right: '30px', zIndex: 1000 }}>
-            <button 
-              onClick={() => setCrudModal({ open: true, action: 'tambah', type: 'halte', id: null, formData: {} })}
-              style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)' }}
+          <div style={{ position: "absolute", bottom: "30px", right: "30px", zIndex: 1000 }}>
+            <button
+              onClick={() => setCrudModal({ open: true, action: "tambah", type: "halte", id: null, formData: {} })}
+              style={{ background: "#10b981", color: "white", border: "none", padding: "12px 20px", borderRadius: "30px", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: "600", boxShadow: "0 4px 12px rgba(16,185,129,0.4)" }}
             >
               <Plus size={18} /> Tambah Data Baru
             </button>
@@ -884,59 +1168,90 @@ function MapView() {
         )}
 
         {/* LEAFLET MAP */}
-        <MapContainer center={[-6.914744, 107.60981]} zoom={13} className="leaflet-fullscreen" zoomControl={false} ref={mapRef} style={{ width: "100%", height: "100%", zIndex: 10 }}>
+        <MapContainer
+          center={[-6.914744, 107.60981]}
+          zoom={13}
+          className="leaflet-fullscreen"
+          zoomControl={false}
+          ref={mapRef}
+          style={{ width: "100%", height: "100%", zIndex: 10 }}
+        >
           <MapController flyTarget={flyTarget} />
           <MapEventHandler onMapClick={handleMapClick} />
           <TileLayer url={getTileUrl()} attribution="&copy; WebGIS Transportasi Bandung" />
-          
+
+          {/* Lingkaran radius halte yang difokuskan */}
           {focusedHalteLatLng && (
-            <Circle center={focusedHalteLatLng} radius={dynamicRadius} pathOptions={{ color: "#f43f5e", weight: 2, dashArray: "10, 10", fillColor: "#f43f5e", fillOpacity: 0.05 }} />
+            <Circle
+              center={focusedHalteLatLng}
+              radius={dynamicRadius}
+              pathOptions={{
+                color: COLOR.wisata, weight: 2, dashArray: "10, 10",
+                fillColor: COLOR.wisata, fillOpacity: 0.05,
+              }}
+            />
           )}
 
+          {/* Layer Wisata */}
           {showWisata && wisataGeoJson && (
             <GeoJSON
-              key={`wisata-gis-layer-${showWisata}-${showNearbyWisataOnly}-${focusedHalteLatLng?.lat || "none"}-${dynamicRadius}`}
+              key={`wisata-${showWisata}-${showNearbyWisataOnly}-${focusedHalteLatLng?.lat ?? "none"}-${dynamicRadius}`}
               data={wisataGeoJson}
               style={(feature) => {
                 let isInside = false;
                 if (focusedHalteLatLng) {
-                  let centroid = focusedHalteLatLng;
-                  if (feature.geometry?.type === "Point") {
-                    centroid = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                  } else {
-                    const coords = feature.geometry.type === "Polygon" ? feature.geometry.coordinates[0] : feature.geometry.coordinates[0][0];
-                    let latSum = 0, lngSum = 0;
-                    coords.forEach(c => { lngSum += c[0]; latSum += c[1]; });
-                    centroid = L.latLng(latSum / coords.length, lngSum / coords.length);
-                  }
-                  isInside = focusedHalteLatLng.distanceTo(centroid) <= dynamicRadius + 50;
+                  const c = getCentroid(feature);
+                  isInside = c ? focusedHalteLatLng.distanceTo(c) <= dynamicRadius + 50 : false;
                 }
-                
-                if (focusedHalteLatLng && isInside) return { color: "#f43f5e", weight: 2, fillColor: "#f43f5e", fillOpacity: 0.7 };
-                return { color: "rgba(244,63,94,0.5)", weight: 1.5, fillColor: "#e11d48", fillOpacity: focusedHalteLatLng ? 0.1 : 0.25 };
+                if (focusedHalteLatLng && isInside)
+                  return { color: COLOR.wisata, weight: 2, fillColor: COLOR.wisata, fillOpacity: 0.65 };
+                return {
+                  color: `${COLOR.wisata}88`,
+                  weight: 1.5,
+                  fillColor: "#e11d48",
+                  fillOpacity: focusedHalteLatLng ? 0.1 : 0.25,
+                };
               }}
               filter={filterWisataFeatures}
               onEachFeature={onEachWisataFeature}
+              pointToLayer={(feature, latlng) =>
+                L.marker(latlng, { icon: createWisataIcon(feature.properties?.nama_wisata, feature.properties?.deskripsi) })
+              }
             />
           )}
 
+          {/* Layer Rute */}
           {routeGeoJson && (
-            <GeoJSON key={`route-gis-layer-${JSON.stringify(activeRoutes)}-${focusedRoute}`} data={routeGeoJson} style={getRouteStyle} filter={filterRouteFeatures} onEachFeature={onEachRouteFeature} />
+            <GeoJSON
+              key={`route-${JSON.stringify(activeRoutes)}-${focusedRoute}`}
+              data={routeGeoJson}
+              style={getRouteStyle}
+              filter={filterRouteFeatures}
+              onEachFeature={onEachRouteFeature}
+            />
           )}
 
+          {/* Layer Halte */}
           {halteGeoJson && (
-            <GeoJSON key={`halte-gis-layer-${JSON.stringify(showHalte)}-${focusedRoute}-${focusedHalteLatLng?.lat || "none"}`} data={halteGeoJson} pointToLayer={haltePointToLayer} filter={filterHalteFeatures} />
+            <GeoJSON
+              key={`halte-${JSON.stringify(showHalte)}-${focusedRoute}-${focusedHalteLatLng?.lat ?? "none"}`}
+              data={halteGeoJson}
+              pointToLayer={haltePointToLayer}
+              filter={filterHalteFeatures}
+            />
           )}
         </MapContainer>
       </main>
 
-      {/* modal form login */}
+      {/* ══════════════════════════════════════════════════════════
+          MODAL LOGIN ADMIN
+      ══════════════════════════════════════════════════════════ */}
       {showLogin && (
-        <div className="modal-overlay" onClick={closeLogin} role="dialog" aria-modal="true" aria-label="Modal masuk admin" style={{ zIndex: 9999 }}>
+        <div className="modal-overlay" onClick={closeLogin} role="dialog" aria-modal="true" style={{ zIndex: 9999 }}>
           <div className="login-glass-card animate-scale-in" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-x" onClick={closeLogin} aria-label="Tutup modal"><X size={15} /></button>
+            <button className="modal-close-x" onClick={closeLogin}><X size={15} /></button>
             <div className="modal-header">
-              <div className="modal-icon" aria-hidden="true"><Lock size={22} color="#10b981" /></div>
+              <div className="modal-icon"><Lock size={22} color="#10b981" /></div>
               <h2>Masuk ke Dashboard</h2>
               <p>Gunakan akun admin untuk mengelola sistem</p>
             </div>
@@ -954,8 +1269,8 @@ function MapView() {
                   </button>
                 </div>
               </div>
-              {loginError && <p className="login-error-msg" style={{color: '#ef4444', fontSize: '13px', margin: '10px 0'}}>{loginError}</p>}
-              <button type="submit" className="btn-login-submit" style={{width: '100%', padding: '12px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '10px'}}>
+              {loginError && <p style={{ color: "#ef4444", fontSize: "13px", margin: "10px 0" }}>{loginError}</p>}
+              <button type="submit" className="btn-login-submit" style={{ width: "100%", padding: "12px", background: "#10b981", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "10px" }}>
                 Masuk <ArrowRight size={16} />
               </button>
             </form>
@@ -963,36 +1278,41 @@ function MapView() {
         </div>
       )}
 
-      {/* ================= MODAL CRUD ADMIN ================= */}
+      {/* ══════════════════════════════════════════════════════════
+          MODAL CRUD ADMIN
+      ══════════════════════════════════════════════════════════ */}
       {crudModal.open && (
         <div className="modal-overlay" style={{ zIndex: 9999 }}>
-          <div className="login-glass-card animate-scale-in" style={{ maxWidth: '500px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-x" onClick={() => setCrudModal({ ...crudModal, open: false })}>
+          <div
+            className="login-glass-card animate-scale-in"
+            style={{ maxWidth: "500px", width: "90%", maxHeight: "90vh", overflowY: "auto" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="modal-close-x" onClick={() => setCrudModal((p) => ({ ...p, open: false }))}>
               <X size={15} />
             </button>
-            
-            <div className="modal-header" style={{ marginBottom: '20px' }}>
+            <div className="modal-header" style={{ marginBottom: "20px" }}>
               <h2>
-                {crudModal.action === 'edit' ? '✏️ Edit' : crudModal.action === 'tambah' ? '➕ Tambah' : '🗑️ Hapus'} Data
-                {crudModal.action !== 'tambah' && ` ${crudModal.type.toUpperCase()}`}
+                {crudModal.action === "edit" ? "✏️ Edit" : crudModal.action === "tambah" ? "➕ Tambah" : "🗑️ Hapus"} Data
+                {crudModal.action !== "tambah" && ` ${crudModal.type.toUpperCase()}`}
               </h2>
             </div>
 
             {crudModal.action === "delete" ? (
               <div style={{ textAlign: "center" }}>
                 <p style={{ color: "#334155", marginBottom: "20px" }}>Apakah Anda yakin ingin menghapus permanen data ini dari Database?</p>
-                <button onClick={handleCrudSubmit} style={{ width: '100%', padding: '12px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button onClick={handleCrudSubmit} style={{ width: "100%", padding: "12px", background: "#ef4444", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
                   Ya, Hapus Permanen
                 </button>
               </div>
             ) : (
               <form onSubmit={handleCrudSubmit} className="modal-form">
-                
-                {/* PEMILIHAN TIPE JIKA MODE TAMBAH */}
-                {crudModal.action === 'tambah' && (
+
+                {/* Pilih tipe (mode tambah) */}
+                {crudModal.action === "tambah" && (
                   <div className="form-group">
-                    <label>Tipe Data yang ingin ditambahkan</label>
-                    <select className="input" value={crudModal.type} onChange={(e) => setCrudModal({...crudModal, type: e.target.value, formData: {}})} required>
+                    <label>Tipe Data</label>
+                    <select className="input" value={crudModal.type} onChange={(e) => setCrudModal({ ...crudModal, type: e.target.value, formData: {} })} required>
                       <option value="halte">Titik Halte Transportasi</option>
                       <option value="rute">Lintasan Rute Transportasi</option>
                       <option value="wisata">Objek Wisata</option>
@@ -1000,85 +1320,80 @@ function MapView() {
                   </div>
                 )}
 
-                {/* ---------- FORM HALTE ---------- */}
+                {/* FORM HALTE */}
                 {crudModal.type === "halte" && (
                   <>
-                    <div className="form-group"><label>Nama Halte</label><input className="input" name="nama" value={crudModal.formData.nama || ""} onChange={handleCrudChange} required /></div>
-                    <div className="form-group"><label>Kode Halte</label><input className="input" name="kode" value={crudModal.formData.kode || ""} onChange={handleCrudChange} required /></div>
+                    <div className="form-group"><label>Nama Halte</label><input className="input" name="nama" value={crudModal.formData.nama||""} onChange={handleCrudChange} required /></div>
+                    <div className="form-group"><label>Kode Halte</label><input className="input" name="kode" value={crudModal.formData.kode||""} onChange={handleCrudChange} required /></div>
                     <div className="form-group"><label>Jenis</label>
-                      <select className="input" name="jenis" value={crudModal.formData.jenis || ""} onChange={handleCrudChange} required>
+                      <select className="input" name="jenis" value={crudModal.formData.jenis||""} onChange={handleCrudChange} required>
                         <option value="">Pilih Jenis...</option>
                         <option value="Bus Trans">Bus Trans</option>
                         <option value="Angkot">Angkot</option>
                         <option value="Bandros">Bandros</option>
                       </select>
                     </div>
-                    
-                    {/* Input Koordinat Wajib Ditambah untuk Pydantic/PostGIS */}
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <div className="form-group" style={{ flex: 1 }}><label>Longitude (X)</label><input type="number" step="any" className="input" name="longitude" value={crudModal.formData.longitude || ""} onChange={handleCrudChange} required /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Latitude (Y)</label><input type="number" step="any" className="input" name="latitude" value={crudModal.formData.latitude || ""} onChange={handleCrudChange} required /></div>
+                    <div style={{ display:"flex", gap:"10px" }}>
+                      <div className="form-group" style={{ flex:1 }}><label>Longitude (X)</label><input type="number" step="any" className="input" name="longitude" value={crudModal.formData.longitude||""} onChange={handleCrudChange} required /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Latitude (Y)</label><input type="number" step="any" className="input" name="latitude" value={crudModal.formData.latitude||""} onChange={handleCrudChange} required /></div>
                     </div>
-
-                    <div className="form-group"><label>Alamat</label><input className="input" name="alamat" value={crudModal.formData.alamat || ""} onChange={handleCrudChange} /></div>
-                    <div className="form-group"><label>Fasilitas</label><textarea className="input" name="fasilitas" value={crudModal.formData.fasilitas || ""} onChange={handleCrudChange} style={{ minHeight: "60px" }} /></div>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <div className="form-group" style={{ flex: 1 }}><label>Jam Mulai</label><input type="time" className="input" name="jam_operasi_mulai" value={crudModal.formData.jam_operasi_mulai || ""} onChange={handleCrudChange} /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Jam Selesai</label><input type="time" className="input" name="jam_operasi_selesai" value={crudModal.formData.jam_operasi_selesai || ""} onChange={handleCrudChange} /></div>
+                    <div className="form-group"><label>Alamat</label><input className="input" name="alamat" value={crudModal.formData.alamat||""} onChange={handleCrudChange} /></div>
+                    <div className="form-group"><label>Fasilitas</label><textarea className="input" name="fasilitas" value={crudModal.formData.fasilitas||""} onChange={handleCrudChange} style={{ minHeight:"60px" }} /></div>
+                    <div style={{ display:"flex", gap:"10px" }}>
+                      <div className="form-group" style={{ flex:1 }}><label>Jam Mulai</label><input type="time" className="input" name="jam_operasi_mulai" value={crudModal.formData.jam_operasi_mulai||""} onChange={handleCrudChange} /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Jam Selesai</label><input type="time" className="input" name="jam_operasi_selesai" value={crudModal.formData.jam_operasi_selesai||""} onChange={handleCrudChange} /></div>
                     </div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#334155', fontWeight: '600' }}>
-                      <input type="checkbox" name="aktif" checked={crudModal.formData.aktif !== false} onChange={handleCrudChange} style={{ width: '18px', height: '18px', accentColor: '#10b981' }} /> Halte Aktif Beroperasi
+                    <label style={{ display:"flex", alignItems:"center", gap:"8px", cursor:"pointer", color:"#334155", fontWeight:"600" }}>
+                      <input type="checkbox" name="aktif" checked={crudModal.formData.aktif !== false} onChange={handleCrudChange} style={{ width:"18px", height:"18px", accentColor:"#10b981" }} /> Halte Aktif Beroperasi
                     </label>
                   </>
                 )}
 
-                {/* ---------- FORM RUTE ---------- */}
+                {/* FORM RUTE */}
                 {crudModal.type === "rute" && (
                   <>
-                    <div className="form-group"><label>Nama Rute / Trayek</label><input className="input" name="nama_rute" value={crudModal.formData.nama_rute || ""} onChange={handleCrudChange} required /></div>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <div className="form-group" style={{ flex: 1 }}><label>Kode Rute</label><input className="input" name="kode_rute" value={crudModal.formData.kode_rute || ""} onChange={handleCrudChange} required /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Warna Jalur</label><input type="color" className="input" name="warna_jalur" value={crudModal.formData.warna_jalur || "#3b82f6"} onChange={handleCrudChange} style={{ padding: "0", height: "42px" }} /></div>
+                    <div className="form-group"><label>Nama Rute / Trayek</label><input className="input" name="nama_rute" value={crudModal.formData.nama_rute||""} onChange={handleCrudChange} required /></div>
+                    <div style={{ display:"flex", gap:"10px" }}>
+                      <div className="form-group" style={{ flex:1 }}><label>Kode Rute</label><input className="input" name="kode_rute" value={crudModal.formData.kode_rute||""} onChange={handleCrudChange} required /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Warna Jalur</label><input type="color" className="input" name="warna_jalur" value={crudModal.formData.warna_jalur||"#3b82f6"} onChange={handleCrudChange} style={{ padding:"0", height:"42px" }} /></div>
                     </div>
                     <div className="form-group"><label>Jenis</label>
-                      <select className="input" name="jenis" value={crudModal.formData.jenis || ""} onChange={handleCrudChange} required>
-                        <option value="">Pilih Jenis Kendaraan...</option>
+                      <select className="input" name="jenis" value={crudModal.formData.jenis||""} onChange={handleCrudChange} required>
+                        <option value="">Pilih Jenis...</option>
                         <option value="Bus">Bus</option>
                         <option value="Angkot">Angkot</option>
                         <option value="Kereta">Kereta</option>
                       </select>
                     </div>
-                    <div className="form-group"><label>Keterangan Jalur</label><textarea className="input" name="keterangan" value={crudModal.formData.keterangan || ""} onChange={handleCrudChange} style={{ minHeight: "60px" }} /></div>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <div className="form-group" style={{ flex: 1 }}><label>Panjang (KM)</label><input type="number" step="0.01" className="input" name="panjang_km" value={crudModal.formData.panjang_km || ""} onChange={handleCrudChange} /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Waktu (Menit)</label><input type="number" className="input" name="estimasi_waktu" value={crudModal.formData.estimasi_waktu || ""} onChange={handleCrudChange} /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Tarif (Rp)</label><input type="number" className="input" name="tarif" value={crudModal.formData.tarif || ""} onChange={handleCrudChange} /></div>
+                    <div className="form-group"><label>Keterangan Jalur</label><textarea className="input" name="keterangan" value={crudModal.formData.keterangan||""} onChange={handleCrudChange} style={{ minHeight:"60px" }} /></div>
+                    <div style={{ display:"flex", gap:"10px" }}>
+                      <div className="form-group" style={{ flex:1 }}><label>Panjang (KM)</label><input type="number" step="0.01" className="input" name="panjang_km" value={crudModal.formData.panjang_km||""} onChange={handleCrudChange} /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Waktu (Menit)</label><input type="number" className="input" name="estimasi_waktu" value={crudModal.formData.estimasi_waktu||""} onChange={handleCrudChange} /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Tarif (Rp)</label><input type="number" className="input" name="tarif" value={crudModal.formData.tarif||""} onChange={handleCrudChange} /></div>
                     </div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#334155', fontWeight: '600' }}>
-                      <input type="checkbox" name="aktif" checked={crudModal.formData.aktif !== false} onChange={handleCrudChange} style={{ width: '18px', height: '18px', accentColor: '#10b981' }} /> Rute Aktif Beroperasi
+                    <label style={{ display:"flex", alignItems:"center", gap:"8px", cursor:"pointer", color:"#334155", fontWeight:"600" }}>
+                      <input type="checkbox" name="aktif" checked={crudModal.formData.aktif !== false} onChange={handleCrudChange} style={{ width:"18px", height:"18px", accentColor:"#10b981" }} /> Rute Aktif Beroperasi
                     </label>
                   </>
                 )}
 
-                {/* ---------- FORM OBJEK WISATA ---------- */}
+                {/* FORM WISATA */}
                 {crudModal.type === "wisata" && (
                   <>
-                    <div className="form-group"><label>Nama Objek Wisata</label><input className="input" name="nama_wisata" value={crudModal.formData.nama_wisata || ""} onChange={handleCrudChange} required /></div>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <div className="form-group" style={{ flex: 1 }}><label>Kode Wisata</label><input className="input" name="kode_wisata" value={crudModal.formData.kode_wisata || ""} onChange={handleCrudChange} required /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Luas Area (KM²)</label><input type="number" step="0.01" className="input" name="luas_km2" value={crudModal.formData.luas_km2 || ""} onChange={handleCrudChange} /></div>
+                    <div className="form-group"><label>Nama Objek Wisata</label><input className="input" name="nama_wisata" value={crudModal.formData.nama_wisata||""} onChange={handleCrudChange} required /></div>
+                    <div style={{ display:"flex", gap:"10px" }}>
+                      <div className="form-group" style={{ flex:1 }}><label>Kode Wisata</label><input className="input" name="kode_wisata" value={crudModal.formData.kode_wisata||""} onChange={handleCrudChange} required /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Luas Area (KM²)</label><input type="number" step="0.01" className="input" name="luas_km2" value={crudModal.formData.luas_km2||""} onChange={handleCrudChange} /></div>
                     </div>
-                    
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <div className="form-group" style={{ flex: 1 }}><label>Longitude (X)</label><input type="number" step="any" className="input" name="longitude" value={crudModal.formData.longitude || ""} onChange={handleCrudChange} /></div>
-                      <div className="form-group" style={{ flex: 1 }}><label>Latitude (Y)</label><input type="number" step="any" className="input" name="latitude" value={crudModal.formData.latitude || ""} onChange={handleCrudChange} /></div>
+                    <div style={{ display:"flex", gap:"10px" }}>
+                      <div className="form-group" style={{ flex:1 }}><label>Longitude (X)</label><input type="number" step="any" className="input" name="longitude" value={crudModal.formData.longitude||""} onChange={handleCrudChange} /></div>
+                      <div className="form-group" style={{ flex:1 }}><label>Latitude (Y)</label><input type="number" step="any" className="input" name="latitude" value={crudModal.formData.latitude||""} onChange={handleCrudChange} /></div>
                     </div>
-
-                    <div className="form-group"><label>Deskripsi Tempat</label><textarea className="input" name="deskripsi" value={crudModal.formData.deskripsi || ""} onChange={handleCrudChange} style={{ minHeight: "100px" }} /></div>
+                    <div className="form-group"><label>Deskripsi Tempat</label><textarea className="input" name="deskripsi" value={crudModal.formData.deskripsi||""} onChange={handleCrudChange} style={{ minHeight:"100px" }} /></div>
                   </>
                 )}
 
-                <button type="submit" className="btn-login-submit" style={{ width: '100%', padding: '12px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', marginTop: '20px' }}>
+                <button type="submit" className="btn-login-submit" style={{ width:"100%", padding:"12px", background:"#10b981", color:"white", border:"none", borderRadius:"8px", cursor:"pointer", fontWeight:"bold", marginTop:"20px" }}>
                   💾 Simpan Ke Database
                 </button>
               </form>
