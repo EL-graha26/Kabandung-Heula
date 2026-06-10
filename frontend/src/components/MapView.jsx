@@ -750,17 +750,29 @@ function MapView() {
   // ─────────────────────────────────────────────────────────────────────────
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setLoginError("");
-    const fd = new FormData();
-    fd.append("username", e.target["admin-email"].value);
-    fd.append("password", e.target["admin-password"].value);
+    setLoginError("Loading...");
+
+    const userVal = document.getElementById("admin-email").value;
+    const passVal = document.getElementById("admin-password").value;
+
     try {
-      const res = await api.post("/auth/login", fd);
+      const res = await api.post("/auth/login", {
+        email: userVal,
+        password: passVal
+      });
+      
       localStorage.setItem("token", res.data.access_token);
       setIsAdmin(true);
       closeLogin();
-    } catch {
-      setLoginError("Kredensial tidak valid atau server bermasalah.");
+    } catch (error) {
+      if (error.response && error.response.status === 422) {
+        setLoginError("Format masih salah, cek console.");
+        console.error(error.response.data.detail);
+      } else if (error.response && error.response.status === 401) {
+        setLoginError("Email atau password salah.");
+      } else {
+        setLoginError("Error API: " + error.message);
+      }
     }
   };
 
