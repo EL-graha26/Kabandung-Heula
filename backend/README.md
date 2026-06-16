@@ -80,7 +80,7 @@ Melalui Swagger UI, tim *frontend* dapat melihat skema data, mencoba *request*, 
 
 ## 📡 Daftar Endpoint API Utama
 
-API ini dibagi menjadi tiga modul utama: **Halte** (Titik), **Rute** (Garis), dan **Objek Wisata** (Area).
+API ini dibagi menjadi empat modul utama: **Halte** (Titik), **Rute** (Garis), dan **Objek Wisata** (Area), **Authentication**.
 
 ### 🚏 1. Halte (Titik/Point)
 Menangani data halte bus/angkot dengan fitur pencarian spasial berbasis radius.
@@ -112,9 +112,9 @@ Menangani data kawasan wisata dengan geometri berbentuk poligon.
 *   `PUT /api/objek-wisata/{id}` : Memperbarui data atau batas area wisata.
 *   `DELETE /api/objek-wisata/{id}` : Menghapus area wisata.
 
-### 4. Authentication
+### 👨🏾‍💻 4. Authentication
 Menangani login admin.
-* `Post /auth/login` : Memeriksa kredensial pengguna (email & password) dan membuat JWT Access Token untuk masuk ke mode Admin.
+*   `POST /auth/login` : Memeriksa kredensial pengguna (email & password) dan membuat JWT Access Token untuk masuk ke mode Admin.
 
 ---
 
