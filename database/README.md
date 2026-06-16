@@ -10,7 +10,7 @@ Berikut adalah spesifikasi teknis database yang diimplementasikan:
 - **Relasi**: Relasi fisik untuk jaringan transportasi dan relasi spasial dinamis untuk akses wisata menggunakan ST_DWithin.
 
 ## 📌 Entity Relationship Diagram (ERD)
-<img width="1188" height="441" alt="ERD-sigma" src="https://github.com/user-attachments/assets/65cff852-3ece-4bdd-b17c-08b162ba91eb" />
+<img width="866" height="1128" alt="ERD from pgadmin" src="https://github.com/user-attachments/assets/8f975a54-4322-4654-aa86-97d93c2022e6" />
 
 ## 📕 Skema Database
 Database terdiri dari 5 tabel utama:
