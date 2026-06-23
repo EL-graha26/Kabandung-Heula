@@ -430,12 +430,12 @@ Proyek ini dikembangkan oleh **Kelompok 5** — Mata Kuliah Sistem Informasi Geo
 
 
 
-Proyek ini dikembangkan untuk keperluan akademik Mata Kuliah Sistem Informasi Geografis, Program Studi Teknik Informatika, Institut Teknologi Sumatera (ITERA), Tahun 2026.
+Proyek ini dikembangkan untuk Tugas Besar Sistem Informasi Geografis, Program Studi Teknik Informatika, Institut Teknologi Sumatera (ITERA), Tahun 2026.
 
 ---
 
 <div align="center">
 
-Made with 💚 in Bandung by **Kelompok 5** — ITERA
+ **Kelompok 5 Sistem Informasi Geografis 2026** — ITERA
 
 </div>
